@@ -92,9 +92,10 @@ end
 tai.give_item = function (player, item, count)
     local player_name = player:get_player_name()
     local inventory = player:get_inventory()
+    local s = ItemStack(item)
 
     if tonumber(count) == 0 then return end
-    inventory:add_item("main", {name = item, count = tonumber(count)})
+    inventory:add_item("main", {name = item, count = s:get_stack_max()})
 end
 
 local trash = minetest.create_detached_inventory("tai_trash", {
@@ -156,7 +157,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
     for field, val in pairs(fields) do
         if field:find('tai_give:', 1, true) then
-            tai.give_item(player, field:sub(field:find(':', 1, true)+1), 99)
+            tai.give_item(player, field:sub(field:find(':', 1, true)+1))
         end
     end
     player:set_inventory_formspec(tai.build_formspec(name))
