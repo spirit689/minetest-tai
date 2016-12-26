@@ -9,13 +9,14 @@ tai.gui_main = function(cfg)
     end
 
     formspec[#formspec+1] = default.gui_bg..default.gui_bg_img..default.gui_slots
-
-    if cfg and cfg.modlist == 1 then
-        formspec[#formspec+1] = 'image_button[7.5,0;0.6,0.6;tai_hide.png;tai_togglemods;]'
-        formspec[#formspec+1] = 'tooltip[tai_togglemods;Hide mods]'
-    else
-        formspec[#formspec+1] = 'image_button[7.5,0;0.6,0.6;tai_show.png;tai_togglemods;]'
-        formspec[#formspec+1] = 'tooltip[tai_togglemods;Show mods]'
+    if tai.config.modlist == 1 then
+        if cfg and cfg.modlist == 1 then
+            formspec[#formspec+1] = 'image_button[7.5,0;0.6,0.6;tai_hide.png;tai_togglemods;]'
+            formspec[#formspec+1] = 'tooltip[tai_togglemods;Hide mods]'
+        else
+            formspec[#formspec+1] = 'image_button[7.5,0;0.6,0.6;tai_show.png;tai_togglemods;]'
+            formspec[#formspec+1] = 'tooltip[tai_togglemods;Show mods]'
+        end
     end
 
     -- formspec[#formspec+1] = "image_button[7.5,0.7;0.6,0.6;tai_cog.png;tai_settings;]"
@@ -24,9 +25,13 @@ tai.gui_main = function(cfg)
     -- formspec[#formspec+1] = 'image_button[7.5,1.4;0.6,0.6;tai_trash.png;tai_trashmode;]'
     -- formspec[#formspec+1] = 'tooltip[tai_trashmode;Delete items]'
 
-    formspec[#formspec+1] = 'image_button[7.5,0.7;0.6,0.6;tai_search.png;tai_togglesearch;]'
-    formspec[#formspec+1] = 'tooltip[tai_togglesearch;Search...]'
+    return table.concat(formspec, "")
+end
 
+tai.gui_tabs = function(cfg)
+    local formspec = {'tabheader[0,0;tai_tab;'}
+    formspec[#formspec+1] = table.concat(tai.tabs, ',')
+    formspec[#formspec+1] = ';'..cfg.tab..';true;false]'
     return table.concat(formspec, "")
 end
 
@@ -46,6 +51,21 @@ tai.gui_craft = function()
         "image[4.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]"
 end
 
+tai.gui_craftequip = function(cfg)
+    local formspec = {}
+    if armor and armor.def then
+        formspec[#formspec+1] = 'list[detached:'..cfg.player_name..'_armor;armor;0,0.25;1,4;]'
+        formspec[#formspec+1] = 'list[detached:'..cfg.player_name..'_armor;armor;1,3.25;2,1;4]'
+        formspec[#formspec+1] = 'image[1.25,0.45;1.5,3;'..armor.textures[cfg.player_name].preview..']'
+    end
+
+    formspec[#formspec+1] = "list[current_player;craft;3,0.25;3,3;]"..
+        "listring[current_player;craft]"..
+        "list[detached:tai_trash;main;7,3.25;1,1;]"..
+        "list[current_player;craftpreview;6,1.25;1,1;]"
+    return table.concat(formspec, '')
+end
+
 tai.gui_mods = function(cfg)
     local formspec = {'textlist[8,0;3,8.8;tai_mod;'}
     table.insert(formspec,table.concat(tai.modnames, ","))
@@ -55,7 +75,7 @@ end
 
 tai.gui_items = function(cfg)
     local creative_list = {}
-    local dx, dy = 0.8, 0.9
+    local dx, dy = 0.83, 0.9
     local x, y = 0, 0
     local w, h = 0.9, 0.9
     local total = cfg.cols * cfg.rows
@@ -103,11 +123,11 @@ tai.gui_items = function(cfg)
     end
 
     if #creative_list > total then
-        formspec[#formspec + 1] = 'button[5.6,'..tostring(dy*cfg.rows)..';0.9,0.9;tai_prev;<<]'
+        formspec[#formspec + 1] = 'button[5.81,'..tostring(dy*cfg.rows)..';0.9,0.9;tai_prev;<<]'
         formspec[#formspec+1] = 'tooltip[tai_prev;Previous page]'
-        formspec[#formspec + 1] = 'button[6.4,'..tostring(dy*cfg.rows)..';0.9,0.9;tai_next;>>]'
+        formspec[#formspec + 1] = 'button[6.64,'..tostring(dy*cfg.rows)..';0.9,0.9;tai_next;>>]'
         formspec[#formspec+1] = 'tooltip[tai_next;Next Page]'
-        formspec[#formspec + 1] = 'label[4.2,'..tostring(dy*cfg.rows+0.2)..';'..tostring(cfg.page+1)..'/'..tostring(math.floor(#creative_list/total)+1)..']'
+        formspec[#formspec + 1] = 'label[4.5,'..tostring(dy*cfg.rows+0.2)..';'..tostring(cfg.page+1)..'/'..tostring(math.floor(#creative_list/total)+1)..']'
     end
 
     return table.concat(formspec, "")
@@ -115,8 +135,8 @@ end
 
 tai.gui_search = function(cfg)
     local formspec = {}
-    formspec[#formspec + 1] = 'field[0.3,'..tostring(0.9*cfg.rows+0.27)..';3.31,1;tai_search;;'..minetest.formspec_escape(cfg.filter)..']'
-    formspec[#formspec + 1] = 'button[3.2,'..tostring(0.9*cfg.rows)..';0.9,0.9;tai_resetsearch;R]'
+    formspec[#formspec + 1] = 'field[0.3,'..tostring(0.9*cfg.rows+0.27)..';3.36,1;tai_search;;'..minetest.formspec_escape(cfg.filter)..']'
+    formspec[#formspec + 1] = 'button[3.32,'..tostring(0.9*cfg.rows)..';0.9,0.9;tai_resetsearch;X]'
     formspec[#formspec+1] = 'tooltip[tai_resetsearch;Reset search]'
     return table.concat(formspec, "")
 end

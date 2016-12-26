@@ -6,6 +6,10 @@ tai.config = {}
 tai.player_config = {}
 tai.modnames = {}
 tai.itemlist = {}
+tai.tabs = {
+    'Main',
+    'Items'
+}
 
 local path = minetest.get_modpath(minetest.get_current_modname())
 dofile(path..'/config.lua')
@@ -32,6 +36,22 @@ tai.init = function (player)
     table.sort(tai.modnames)
     tai.config.total = count
     print("[TAI] Found "..count.." registered items in "..#tai.modnames.." mods.")
+
+    -- 3d_armor
+    -- override armor.update_inventory to see preview changes
+    if armor and tai.config.armor == 1 then
+        ---
+        armor.update_inventory = function (self, player)
+            local name = armor:get_valid_player(player, "[set_player_armor]")
+            if not name or not tai.player_config[name] then
+                return
+            else
+                player:set_inventory_formspec(tai.build_formspec(name))
+            end
+        end
+        ---
+    end
+
 end
 
 tai.is_allowed_item = function(cfg, name)
@@ -46,31 +66,37 @@ end
 
 tai.init_player = function(player_name)
     tai.player_config[player_name] = {
+        player_name = player_name,
         -- item list
         page = 0,
         cols = 9,
         rows = 4,
         -- search filter
         filter = '',
-        -- show item list & search field
-        itemlist = 0,
         -- show mod list
         modlist = 0,
         -- selected mod
-        category = 1
+        category = 1,
+        -- current tab
+        tab = 1
     }
 end
 
 tai.build_formspec = function(player_name)
     local cfg = tai.player_config[player_name]
     local formspec = {}
-    formspec = { tai.gui_main(cfg) }
+
+    formspec = { tai.gui_main(cfg), tai.gui_tabs(cfg) }
 
     if cfg.itemlist == 1 then
         formspec[#formspec+1] = tai.gui_items(cfg)
         formspec[#formspec+1] = tai.gui_search(cfg)
     else
-        formspec[#formspec+1] = tai.gui_craft()
+        if tai.config.armor == 1 then
+            formspec[#formspec+1] = tai.gui_craftequip(cfg)
+        else
+            formspec[#formspec+1] = tai.gui_craft()
+        end
     end
 
     if cfg.modlist == 1 then
@@ -110,6 +136,7 @@ trash:set_size("main", 1)
 
 minetest.register_on_joinplayer(function(player)
     minetest.after(tai.config.delay, function()
+        minetest.chat_send_player(player:get_player_name(), "TAI: Initialized")
         tai.init_player(player:get_player_name())
         player:set_inventory_formspec(tai.build_formspec(player:get_player_name()))
     end)
@@ -119,6 +146,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     local name = player:get_player_name()
     local cfg = tai.player_config[name]
     local evt = {}
+    print(dump(fields))
     if fields["tai_next"] then
         cfg.page = cfg.page + 1
     elseif fields["tai_prev"] then
@@ -143,12 +171,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
                 cfg.filter = tai.modnames[tonumber(evt.row)] .. ":"
                 cfg.category = evt.row
                 cfg.itemlist = 1
+                cfg.tab = 2
             end
         end
-    elseif fields["tai_togglesearch"] then
-        if cfg.itemlist == 1 then
+    elseif fields["tai_tab"] then
+        cfg.tab = tonumber(fields["tai_tab"])
+        if cfg.tab == 1 then
             cfg.itemlist = 0
-        else
+        elseif cfg.tab == 2 then
             cfg.itemlist = 1
         end
     elseif fields["tai_resetsearch"] then
