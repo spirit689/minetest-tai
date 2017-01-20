@@ -5,11 +5,8 @@ tai.config.whitelist = {
     -- etc...
 }
 
--- init delay for joined players
+-- init delay in seconds for joined players
 tai.config.delay = 5
 
 -- show mods list
 tai.config.modlist = 1
-
--- 3d_armor support
-tai.config.armor = 1

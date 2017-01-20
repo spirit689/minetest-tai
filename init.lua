@@ -22,7 +22,7 @@ tai.init = function (player)
 
     for name,def in pairs(minetest.registered_items) do
         if not (def.groups.not_in_creative_inventory == 1) or tai.is_allowed_item(tai.config, name) then
-            modname = name:match('(.+)\:')
+            modname = name:match('(.+):')
             if modname and modname ~= "" and modnames[modname] == nil then
                 modnames[modname] = 1
             end
@@ -39,6 +39,10 @@ tai.init = function (player)
 
     -- 3d_armor
     -- override armor.update_inventory to see preview changes
+    tai.config.armor = 0
+    if minetest.get_modpath("3d_armor") ~= nil then
+        tai.config.armor = 1
+    end
     if armor and tai.config.armor == 1 then
         ---
         armor.update_inventory = function (self, player)
@@ -147,6 +151,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     local cfg = tai.player_config[name]
     local evt = {}
     print(dump(fields))
+
+    if fields["quit"] then return end
+
     if fields["tai_next"] then
         cfg.page = cfg.page + 1
     elseif fields["tai_prev"] then

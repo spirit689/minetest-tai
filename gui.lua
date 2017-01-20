@@ -137,6 +137,7 @@ tai.gui_search = function(cfg)
     local formspec = {}
     formspec[#formspec + 1] = 'field[0.3,'..tostring(0.9*cfg.rows+0.27)..';3.36,1;tai_search;;'..minetest.formspec_escape(cfg.filter)..']'
     formspec[#formspec + 1] = 'button[3.32,'..tostring(0.9*cfg.rows)..';0.9,0.9;tai_resetsearch;X]'
-    formspec[#formspec+1] = 'tooltip[tai_resetsearch;Reset search]'
+    formspec[#formspec + 1] = 'tooltip[tai_resetsearch;Reset search]'
+    formspec[#formspec + 1] = 'field_close_on_enter[tai_search;false]'
     return table.concat(formspec, "")
 end
