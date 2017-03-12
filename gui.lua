@@ -8,22 +8,17 @@ tai.gui_main = function(cfg)
         formspec[#formspec+1] = "size[8,8.6]"
     end
 
-    formspec[#formspec+1] = default.gui_bg..default.gui_bg_img..default.gui_slots
-    if tai.config.modlist == 1 then
+    formspec[#formspec+1] = 'bgcolor[#21252BFF;false]'
+    formspec[#formspec+1] = 'listcolors[#282C34FF;#2C323CFF;#181A1FFF;#4D78CCFF;#FFFFFFFF]'
+    if tai.config.modlist == true then
         if cfg and cfg.modlist == 1 then
-            formspec[#formspec+1] = 'image_button[7.5,0;0.6,0.6;tai_hide.png;tai_togglemods;]'
+            formspec[#formspec+1] = 'image_button[7.5,0;0.6,0.85;tai_hide.png;tai_togglemods;]'
             formspec[#formspec+1] = 'tooltip[tai_togglemods;Hide mods]'
         else
-            formspec[#formspec+1] = 'image_button[7.5,0;0.6,0.6;tai_show.png;tai_togglemods;]'
+            formspec[#formspec+1] = 'image_button[7.5,0;0.6,0.85;tai_show.png;tai_togglemods;]'
             formspec[#formspec+1] = 'tooltip[tai_togglemods;Show mods]'
         end
     end
-
-    -- formspec[#formspec+1] = "image_button[7.5,0.7;0.6,0.6;tai_cog.png;tai_settings;]"
-    -- formspec[#formspec+1] = 'tooltip[tai_settings;Options]'
-
-    -- formspec[#formspec+1] = 'image_button[7.5,1.4;0.6,0.6;tai_trash.png;tai_trashmode;]'
-    -- formspec[#formspec+1] = 'tooltip[tai_trashmode;Delete items]'
 
     return table.concat(formspec, "")
 end
@@ -53,11 +48,26 @@ end
 
 tai.gui_craftequip = function(cfg)
     local formspec = {}
+    local stats = armor.def[cfg.player_name];
+
     if armor and armor.def then
         formspec[#formspec+1] = 'list[detached:'..cfg.player_name..'_armor;armor;0,0.25;1,4;]'
         formspec[#formspec+1] = 'list[detached:'..cfg.player_name..'_armor;armor;1,3.25;2,1;4]'
-        formspec[#formspec+1] = 'image[1.25,0.45;1.5,3;'..armor.textures[cfg.player_name].preview..']'
+        formspec[#formspec+1] = 'image[1.22,0.35;1.7,3.2;'..armor.textures[cfg.player_name].preview..']'
     end
+
+    formspec[#formspec+1] = 'image[3,3.25;0.4,0.4;tai_chestplate.png]'
+    formspec[#formspec+1] = 'label[3.4,3.20;'..stats.level..']'
+    formspec[#formspec+1] = 'image[3,3.75;0.4,0.4;tai_heart.png]'
+    formspec[#formspec+1] = 'label[3.4,3.70;'..stats.heal..']'
+
+    formspec[#formspec+1] = 'image[4,3.25;0.4,0.4;tai_rad.png]'
+    formspec[#formspec+1] = 'label[4.4,3.20;'..stats.radiation..']'
+
+    formspec[#formspec+1] = 'image[5,3.25;0.4,0.4;tai_fire.png]'
+    formspec[#formspec+1] = 'label[5.4,3.20;'..stats.water..']'
+    formspec[#formspec+1] = 'image[5,3.75;0.4,0.4;tai_water.png]'
+    formspec[#formspec+1] = 'label[5.4,3.70;'..stats.fire..']'
 
     formspec[#formspec+1] = "list[current_player;craft;3,0.25;3,3;]"..
         "listring[current_player;craft]"..
@@ -77,9 +87,10 @@ tai.gui_items = function(cfg)
     local creative_list = {}
     local dx, dy = 0.83, 0.9
     local x, y = 0, 0
-    local w, h = 0.9, 0.9
+    local w, h = 0.9, 0.85
     local total = cfg.cols * cfg.rows
     local index = 1
+    local maxpages = 0
     local formspec = {}
     local def = {}
 
@@ -98,9 +109,15 @@ tai.gui_items = function(cfg)
     if cfg.page < 0 then
         cfg.page = 0
     end
-    if cfg.page >= math.floor(#creative_list/total) then
-        cfg.page = math.floor(#creative_list/total)
+
+    maxpages = math.floor(#creative_list/total)
+    if #creative_list % total == 0 then
+        maxpages = maxpages - 1
     end
+    if cfg.page >= maxpages then
+        cfg.page = maxpages
+    end
+
     index = total * cfg.page
 
     for i=1,total do
@@ -112,7 +129,8 @@ tai.gui_items = function(cfg)
             else
                 itemcaption = minetest.formspec_escape('['..itemname..']')
             end
-            formspec[#formspec + 1] = 'item_image_button['..x..','..y..';'..w..','..h..';'..itemname..';tai_give:'..itemname..';]'
+            formspec[#formspec + 1] = 'image_button['..x..','..y..';'..w..','..h..';tai_slot.png;tai_give:'..itemname..';;false;false;tai_slot_active.png]'
+            formspec[#formspec + 1] = 'item_image['..tostring(x+0.1)..','..tostring(y+0.1)..';'..tostring(w-0.3)..','..tostring(h-0.3)..';'..itemname..']'
             formspec[#formspec + 1] = 'tooltip[tai_give:'..itemname..';'..itemcaption..']'
             x = x + dx
             if i%cfg.cols == 0 then
@@ -123,11 +141,11 @@ tai.gui_items = function(cfg)
     end
 
     if #creative_list > total then
-        formspec[#formspec + 1] = 'button[5.81,'..tostring(dy*cfg.rows)..';0.9,0.9;tai_prev;<<]'
+        formspec[#formspec + 1] = 'image_button[5.81,'..tostring(dy*cfg.rows)..';0.9,0.85;tai_slot.png;tai_prev;<<;false;false;tai_slot_active.png]'
         formspec[#formspec+1] = 'tooltip[tai_prev;Previous page]'
-        formspec[#formspec + 1] = 'button[6.64,'..tostring(dy*cfg.rows)..';0.9,0.9;tai_next;>>]'
+        formspec[#formspec + 1] = 'image_button[6.64,'..tostring(dy*cfg.rows)..';0.9,0.85;tai_slot.png;tai_next;>>;false;false;tai_slot_active.png]'
         formspec[#formspec+1] = 'tooltip[tai_next;Next Page]'
-        formspec[#formspec + 1] = 'label[4.5,'..tostring(dy*cfg.rows+0.2)..';'..tostring(cfg.page+1)..'/'..tostring(math.floor(#creative_list/total)+1)..']'
+        formspec[#formspec + 1] = 'label[4.5,'..tostring(dy*cfg.rows+0.2)..';'..tostring(cfg.page+1)..'/'..tostring(maxpages+1)..']'
     end
 
     return table.concat(formspec, "")
@@ -136,7 +154,7 @@ end
 tai.gui_search = function(cfg)
     local formspec = {}
     formspec[#formspec + 1] = 'field[0.3,'..tostring(0.9*cfg.rows+0.27)..';3.36,1;tai_search;;'..minetest.formspec_escape(cfg.filter)..']'
-    formspec[#formspec + 1] = 'button[3.32,'..tostring(0.9*cfg.rows)..';0.9,0.9;tai_resetsearch;X]'
+    formspec[#formspec + 1] = 'image_button[3.32.64,'..tostring(0.9*cfg.rows)..';0.9,0.85;tai_slot.png;tai_resetsearch;X;false;false;tai_slot_active.png]'
     formspec[#formspec + 1] = 'tooltip[tai_resetsearch;Reset search]'
     formspec[#formspec + 1] = 'field_close_on_enter[tai_search;false]'
     return table.concat(formspec, "")

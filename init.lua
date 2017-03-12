@@ -1,5 +1,5 @@
--- Minetest 0.4.13 mod tai
--- Version: 0.0.1
+-- Minetest mod tai
+-- Version: 0.1.0
 
 tai = {}
 tai.config = {}
@@ -12,7 +12,6 @@ tai.tabs = {
 }
 
 local path = minetest.get_modpath(minetest.get_current_modname())
-dofile(path..'/config.lua')
 dofile(path..'/gui.lua')
 
 tai.init = function (player)
@@ -20,14 +19,20 @@ tai.init = function (player)
     local modname = ''
     local modnames = {}
 
+    tai.config.delay = tai.setting_get('tai_delay_time', 5)
+    tai.config.modlist = minetest.setting_get('tai_modlist') == 'true'
+    tai.config.whitelist = tai.setting_get('tai_filters', ''):split(',')
+
     for name,def in pairs(minetest.registered_items) do
-        if not (def.groups.not_in_creative_inventory == 1) or tai.is_allowed_item(tai.config, name) then
-            modname = name:match('(.+):')
-            if modname and modname ~= "" and modnames[modname] == nil then
-                modnames[modname] = 1
+        if name ~= '' then
+            if not (def.groups.not_in_creative_inventory == 1) or tai.is_allowed_item(tai.config, name) then
+                modname = name:match('(.+):')
+                if modname and modname ~= "" and modnames[modname] == nil then
+                    modnames[modname] = 1
+                end
+                table.insert(tai.itemlist,name)
+                count = count + 1
             end
-            table.insert(tai.itemlist,name)
-            count = count + 1
         end
     end
     for k,v in pairs(modnames) do
@@ -39,11 +44,11 @@ tai.init = function (player)
 
     -- 3d_armor
     -- override armor.update_inventory to see preview changes
-    tai.config.armor = 0
+    tai.config.armor = false
     if minetest.get_modpath("3d_armor") ~= nil then
-        tai.config.armor = 1
+        tai.config.armor = true
     end
-    if armor and tai.config.armor == 1 then
+    if armor and tai.config.armor == true then
         ---
         armor.update_inventory = function (self, player)
             local name = armor:get_valid_player(player, "[set_player_armor]")
@@ -96,7 +101,7 @@ tai.build_formspec = function(player_name)
         formspec[#formspec+1] = tai.gui_items(cfg)
         formspec[#formspec+1] = tai.gui_search(cfg)
     else
-        if tai.config.armor == 1 then
+        if tai.config.armor == true then
             formspec[#formspec+1] = tai.gui_craftequip(cfg)
         else
             formspec[#formspec+1] = tai.gui_craft()
@@ -117,6 +122,15 @@ tai.texlist_event = function (str)
     e.type = str:sub(1, str:find(':', 1, true)-1)
     e.row = str:sub(str:find(':', 1, true)+1)
     return e
+end
+
+tai.setting_get = function(setting, default)
+    local val = minetest.setting_get(setting)
+    if val and val ~= '' then
+        return val
+    else
+        return default
+    end
 end
 
 tai.give_item = function (player, item, count)
@@ -150,7 +164,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     local name = player:get_player_name()
     local cfg = tai.player_config[name]
     local evt = {}
-    print(dump(fields))
 
     if fields["quit"] then return end
 
@@ -167,7 +180,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     elseif fields["tai_settings"] then
         minetest.chat_send_player(name, "WIP")
     elseif fields["tai_search"] and fields["key_enter"] == "true" and fields["key_enter_field"] == "tai_search" then
-        cfg.filter = fields["tai_search"]
+        if cfg.filter ~= fields["tai_search"] then
+            cfg.filter = fields["tai_search"]
+        else
+            cfg.filter = ''
+        end
         cfg.page = 0
         cfg.itemlist = 1
     elseif fields["tai_mod"] then
@@ -175,10 +192,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
             evt = tai.texlist_event(fields["tai_mod"])
             -- evt = minetest.explode_table_event(fields["tai_mod"]) -- =(
             if evt.type == "DCL" then
-                cfg.filter = tai.modnames[tonumber(evt.row)] .. ":"
+                cfg.filter = tai.modnames[tonumber(evt.row)]
                 cfg.category = evt.row
                 cfg.itemlist = 1
                 cfg.tab = 2
+                cfg.page = 0
             end
         end
     elseif fields["tai_tab"] then
