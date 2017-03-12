@@ -13,6 +13,6 @@ Click item button to get item stack.
 Press Enter again or click X button to repeat the search.
 
 ---
-![Screenshot 1](/screenshot_1.png?raw=true)
-![Screenshot 2](/screenshot_2.png?raw=true)
-![Screenshot 2](/screenshot_3.png?raw=true)
+![Screenshot 1](/screenshoot_1.jpg?raw=true)
+![Screenshot 2](/screenshoot_2.jpg?raw=true)
+![Screenshot 2](/screenshoot_3.jpg?raw=true)
