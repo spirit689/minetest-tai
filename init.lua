@@ -1,5 +1,5 @@
 -- Minetest mod tai
--- Version: 0.1.0
+-- Version: 0.1.1
 
 tai = {}
 tai.config = {}
@@ -20,7 +20,6 @@ tai.init = function (player)
     local modnames = {}
 
     tai.config.delay = tai.setting_get('tai_delay_time', 5)
-    tai.config.modlist = minetest.setting_get('tai_modlist') == 'true'
     tai.config.whitelist = tai.setting_get('tai_filters', ''):split(',')
 
     for name,def in pairs(minetest.registered_items) do
@@ -40,7 +39,7 @@ tai.init = function (player)
     end
     table.sort(tai.modnames)
     tai.config.total = count
-    print("[TAI] Found "..count.." registered items in "..#tai.modnames.." mods.")
+    minetest.log("info","[TAI] Found "..count.." registered items in "..#tai.modnames.." mods.")
 
     -- 3d_armor
     -- override armor.update_inventory to see preview changes
@@ -59,8 +58,8 @@ tai.init = function (player)
             end
         end
         ---
+        tai.tabs[3] = 'Armor'
     end
-
 end
 
 tai.is_allowed_item = function(cfg, name)
@@ -78,7 +77,7 @@ tai.init_player = function(player_name)
         player_name = player_name,
         -- item list
         page = 0,
-        cols = 9,
+        cols = 10,
         rows = 4,
         -- search filter
         filter = '',
@@ -97,22 +96,26 @@ tai.build_formspec = function(player_name)
 
     formspec = { tai.gui_main(cfg), tai.gui_tabs(cfg) }
 
-    if cfg.itemlist == 1 then
-        formspec[#formspec+1] = tai.gui_items(cfg)
-        formspec[#formspec+1] = tai.gui_search(cfg)
-    else
+    if cfg.tab == 1 then
         if tai.config.armor == true then
-            formspec[#formspec+1] = tai.gui_craftequip(cfg)
+            formspec[#formspec+1] = tai.gui_armor(cfg)
+            formspec[#formspec+1] = tai.gui_armorcraft()
         else
             formspec[#formspec+1] = tai.gui_craft()
         end
+        formspec[#formspec+1] = tai.gui_player()
+    elseif cfg.tab == 2 then
+        if cfg.itemlist == 1 then
+            formspec[#formspec+1] = tai.gui_items(cfg)
+            formspec[#formspec+1] = tai.gui_player()
+        elseif cfg.modlist == 1 then
+            formspec[#formspec+1] = tai.gui_mods(cfg)
+        end
+    elseif cfg.tab == 3 then
+        formspec[#formspec+1] = tai.gui_armor(cfg)
+        formspec[#formspec+1] = tai.gui_armorstats(cfg)
+        formspec[#formspec+1] = tai.gui_player()
     end
-
-    if cfg.modlist == 1 then
-        formspec[#formspec+1] = tai.gui_mods(cfg)
-    end
-
-    formspec[#formspec+1] = tai.gui_player()
 
     return table.concat(formspec, "")
 end
@@ -171,12 +174,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
         cfg.page = cfg.page + 1
     elseif fields["tai_prev"] then
         cfg.page = cfg.page - 1
-    elseif fields["tai_togglemods"] then
-        if cfg.modlist == 1 then
-            cfg.modlist = 0
-        else
+    elseif fields["tai_showmods"] then
             cfg.modlist = 1
-        end
+            cfg.itemlist = 0
     elseif fields["tai_settings"] then
         minetest.chat_send_player(name, "WIP")
     elseif fields["tai_search"] and fields["key_enter"] == "true" and fields["key_enter_field"] == "tai_search" then
@@ -189,12 +189,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
         cfg.itemlist = 1
     elseif fields["tai_mod"] then
         if fields["tai_mod"] ~= '' then
-            evt = tai.texlist_event(fields["tai_mod"])
-            -- evt = minetest.explode_table_event(fields["tai_mod"]) -- =(
+            evt = minetest.explode_table_event(fields["tai_mod"])
             if evt.type == "DCL" then
                 cfg.filter = tai.modnames[tonumber(evt.row)]
                 cfg.category = evt.row
                 cfg.itemlist = 1
+                cfg.modlist = 0
                 cfg.tab = 2
                 cfg.page = 0
             end
@@ -215,6 +215,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
             tai.give_item(player, field:sub(field:find(':', 1, true)+1))
         end
     end
+
     player:set_inventory_formspec(tai.build_formspec(name))
 end)
 

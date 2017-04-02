@@ -1,6 +1,9 @@
-﻿v0.1.0
+v0.1.1
+-another tab for 3d_armor
+-mod filter
+v0.1.0
 -settingtypes.txt mod settings
--Display of armor for 3d_armor
+-3d_armor icons and stats
 -Repeated pressing Enter in the search field now resets the filter
 -New colors and icons
 -Bugfixes

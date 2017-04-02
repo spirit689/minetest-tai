@@ -1,4 +1,4 @@
 -Player privilegies
 -Additional actions (eg time, weather)
 -Creative support
--Show recipes for items
+-something like crafting guide

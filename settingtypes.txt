@@ -3,6 +3,3 @@ tai_delay_time (Init time) float 5
 
 #    Nodes from here will always be available
 tai_filters (Filters) string
-
-#    Extended UI with mod list
-tai_modlist (Show mods) bool true
