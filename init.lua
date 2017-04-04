@@ -42,22 +42,19 @@ tai.init = function (player)
     minetest.log("info","[TAI] Found "..count.." registered items in "..#tai.modnames.." mods.")
 
     -- 3d_armor
-    -- override armor.update_inventory to see preview changes
     tai.config.armor = false
     if minetest.get_modpath("3d_armor") ~= nil then
         tai.config.armor = true
     end
     if armor and tai.config.armor == true then
-        ---
-        armor.update_inventory = function (self, player)
-            local name = armor:get_valid_player(player, "[set_player_armor]")
+        armor:register_on_update(function(player)
+        	local name = player:get_player_name()
             if not name or not tai.player_config[name] then
                 return
             else
                 player:set_inventory_formspec(tai.build_formspec(name))
             end
-        end
-        ---
+        end)
         tai.tabs[3] = 'Armor'
     end
 end

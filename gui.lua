@@ -43,16 +43,22 @@ end
 tai.gui_armorstats = function(cfg)
     local stats = armor.def[cfg.player_name];
     local formspec = {}
-    formspec[#formspec+1] = 'image[3,0.25;0.4,0.4;tai_chestplate.png]'
-    formspec[#formspec+1] = 'label[3.4,0.20;'..stats.level..']'
-    formspec[#formspec+1] = 'image[3,0.75;0.4,0.4;tai_heart.png]'
-    formspec[#formspec+1] = 'label[3.4,0.70;'..stats.heal..']'
-    formspec[#formspec+1] = 'image[3,1.25;0.4,0.4;tai_rad.png]'
-    formspec[#formspec+1] = 'label[3.4,1.20;'..stats.radiation..']'
-    formspec[#formspec+1] = 'image[3,1.75;0.4,0.4;tai_fire.png]'
-    formspec[#formspec+1] = 'label[3.4,1.70;'..stats.water..']'
-    formspec[#formspec+1] = 'image[3,2.25;0.4,0.4;tai_water.png]'
-    formspec[#formspec+1] = 'label[3.4,2.20;'..stats.fire..']'
+    local h = 0.2
+    local def = {
+        { stats.level, 'tai_chestplate.png' },
+        { stats.heal, 'tai_heart.png' }
+    }
+    if minetest.global_exists("technic") then
+        def[#def + 1] = { stats.groups["radiation"], 'tai_rad.png' }
+    end
+    if armor.config.fire_protect then
+        def[#def + 1] = { stats.fire, 'tai_fire.png' }
+    end
+    for i,v in ipairs(def) do
+        formspec[#formspec+1] = 'image[3,'..tostring(h + 0.05)..';0.4,0.4;'..v[2]..']'
+        formspec[#formspec+1] = 'label[3.4,'..tostring(h)..';'..v[1]..']'
+        h = h + 0.5
+    end
     return table.concat(formspec, '')
 end
 
