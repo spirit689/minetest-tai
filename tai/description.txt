@@ -1,0 +1,5 @@
+TAI
+================
+
+Mod for minetest 0.4.13+
+It allows you to take any registered item in the game.
