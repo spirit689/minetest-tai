@@ -3,3 +3,21 @@ tai_delay_time (Init time) float 5
 
 #    Nodes from here will always be available
 tai_filters (Filters) string
+
+#    Nodes from here will always be available
+tai_bgcolor (Background color [#21252BFF]) string
+
+#    Nodes from here will always be available
+tai_slot_bg (Slot background color [#282C34FF]) string
+
+#    Nodes from here will always be available
+tai_slot_bg_hover (Slot hover color [#2C323CFF]) string
+
+#    Nodes from here will always be available
+tai_slot_border (Slot border color [#181A1FFF]) string
+
+#    Nodes from here will always be available
+tai_tooltip (Tooltip font color [#FFFFFFFF]) string
+
+#    Nodes from here will always be available
+tai_tooltip_bg (Tooltip background color [#66666666]) string

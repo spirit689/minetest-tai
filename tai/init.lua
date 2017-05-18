@@ -72,6 +72,7 @@ end)
 
 tai.register_callback('tai_tab', function(cfg, player, fields)
     cfg.tab = tonumber(fields["tai_tab"])
+    cfg.formspec.mods = 0
     if cfg.tab == 1 then
         cfg.formspec.items = 0
         cfg.formspec.craft = 1
@@ -90,8 +91,14 @@ end)
 tai.register_callback('receive_fields', function(cfg, player, fields)
     for field, val in pairs(fields) do
         if field:find('tai_item:', 1, true) then
-            tai.give_item(player, field:sub(field:find(':', 1, true)+1))
+            tai.do_callback('tai_item', cfg, player, {item=field:sub(field:find(':', 1, true)+1)})
         end
+    end
+end)
+
+tai.register_callback('tai_item', function (cfg, player, fields)
+    if minetest.check_player_privs(player, {creative = true}) then
+        tai.give_item(player, fields.item)
     end
 end)
 
@@ -105,9 +112,19 @@ local trash = minetest.create_detached_inventory("tai_trash", {
 })
 trash:set_size("main", 1)
 
+minetest.register_privilege("creative", {
+	description = "Can use the creative inventory",
+	give_to_singleplayer = false
+})
+
 minetest.register_on_joinplayer(function(player)
     minetest.after(tai.config.delay, function()
         local name = player:get_player_name()
+        local privs = minetest.get_player_privs(name)
+        if minetest.check_player_privs(player, {creative = true}) or minetest.setting_getbool("creative_mode") then
+            privs.creative = true
+        end
+        minetest.set_player_privs(name, privs)
         minetest.chat_send_player(player:get_player_name(), "TAI: Initialized")
         tai.init_player(name)
         tai.do_callback('init_player', tai.player_config[name], player, {})
@@ -128,6 +145,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
             end
         end
     end
+
+    print(dump(cfg.formspec))
+
     player:set_inventory_formspec(tai.build_formspec(name))
 end)
 

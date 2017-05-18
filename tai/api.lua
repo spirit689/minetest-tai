@@ -124,6 +124,9 @@ tai.init = function ()
     local modname = ''
     local modnames = {}
 
+    if minetest.get_modpath('sfinv') and sfinv then
+        sfinv.enabled = false
+    end
     for name,def in pairs(minetest.registered_items) do
         if name ~= '' then
             if not (def.groups.not_in_creative_inventory == 1) or tai.is_allowed_item(name) then
