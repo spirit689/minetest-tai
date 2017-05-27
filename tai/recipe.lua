@@ -126,6 +126,9 @@ tai.add_action('tai_recipe_hide', function (cfg, player, fields)
 end)
 
 tai.add_action('tai_item', function (cfg, player, fields)
+    if minetest.check_player_privs(player, {creative = true}) then
+        return
+    end
     local craft_item = fields.item
     if tai.craft_recipe[craft_item] then
         cfg.formspec.player = 0
