@@ -44,7 +44,7 @@ end
 
 -- callbacks
 
-tai.register_callback('tai_togglearmor', function (cfg, player, fields)
+tai.add_action('tai_togglearmor', function (cfg, player, fields)
     if cfg.formspec.armorstats == 1 then
         cfg.formspec.armorcraft = 1
         cfg.formspec.armorstats = 0
@@ -54,19 +54,15 @@ tai.register_callback('tai_togglearmor', function (cfg, player, fields)
     end
 end)
 
-tai.register_callback('tai_tab', function (cfg, player, fields)
+tai.add_action('tai_tab', function (cfg, player, fields)
     if cfg.tab == 1 then
         cfg.formspec.craft = 0
         cfg.formspec.armor = 1
         cfg.formspec.armorcraft = 1
-    elseif cfg.tab == 2 then
-        cfg.formspec.armor = 0
-        cfg.formspec.armorcraft = 0
-        cfg.formspec.armorstats = 0
     end
 end)
 
-tai.register_callback('init_player', function (cfg, player, fields)
+tai.add_action('init_player', function (cfg, player, fields)
     cfg.formspec.craft = 0
     cfg.formspec.armor = 1
     cfg.formspec.armorcraft = 1

@@ -1,7 +1,7 @@
 tai.build_formspec = function(player_name)
     local cfg = tai.player_config[player_name]
     -- print("player config: "..dump(cfg))
-    formspec = { tai.inv.main(tai.config), tai.inv.pages(cfg) }
+    local formspec = { tai.inv.main(tai.config), tai.inv.pages(cfg) }
     for part, enabled in pairs(cfg.formspec) do
         if enabled == 1 then
             formspec[#formspec + 1] = tai.inv[part](cfg)
@@ -19,13 +19,6 @@ tai.setting_get = function(setting, default)
     end
 end
 
-tai.give_item = function (player, item)
-    local player_name = player:get_player_name()
-    local inventory = player:get_inventory()
-    local s = ItemStack(item)
-    inventory:add_item("main", {name = item, count = s:get_stack_max()})
-end
-
 tai.register_tab = function (def)
     tai.tabs[def.index] = def
     tai.inv.tabs = {}
@@ -34,37 +27,35 @@ tai.register_tab = function (def)
     end
 end
 
-tai.register_callback = function (field, action)
-    if field and field ~= '' then
-        if tai.callbacks[field] == nil then
-            tai.callbacks[field] = {}
+tai.add_action = function (action, func)
+    if action and action ~= '' then
+        if tai.callbacks[action] == nil then
+            tai.callbacks[action] = {}
         end
-        if type(action) == 'function' then
-            table.insert(tai.callbacks[field], action)
+        if type(func) == 'function' then
+            table.insert(tai.callbacks[action], func)
         end
     end
 end
 
-tai.remove_callback = function (field)
-    tai.callbacks[field] = nil
+tai.remove_action = function (action)
+    tai.callbacks[action] = nil
 end
 
-tai.do_callback = function (field, ...)
-    if tai.callbacks[field] ~= nil then
-        for _,cb in ipairs(tai.callbacks[field]) do
+tai.do_action = function (action, ...)
+    if tai.callbacks[action] ~= nil then
+        for _,cb in ipairs(tai.callbacks[action]) do
             cb(...)
         end
     end
 end
 
-tai.is_allowed_item = function(name)
-    local l = tai.config.whitelist
-    for _,v in ipairs(l) do
-        if name:find(v, 1, true) then
-            return true
-        end
+tai.apply_filter = function (action, ...)
+    if tai.callbacks[action] ~= nil then
+        return tai.do_action(action, ...)
+    else
+        return ...
     end
-    return false
 end
 
 tai.init_player = function(player_name)
@@ -81,52 +72,10 @@ tai.init_player = function(player_name)
     }
 end
 
-tai.inv_button = function (id, x, y, caption)
-    return 'image_button['..tostring(x)..','..tostring(y)..';0.9,0.85;tai_slot.png;'..id..';'..minetest.formspec_escape(caption)..';false;false;tai_slot_active.png]'
-end
-
--- return small grid (10x9) coords
-tai.inv_coords = function (args)
-    local dx, dy = 0.792, 0.9
-    local maxx, maxy = 9, 8
-    local coords = {}
-    if args.x then
-        if type(args.x) == 'string' then
-            if args.x == 'left' then
-                coords.x = 0
-            elseif args.x == 'right' then
-                coords.x = dx * maxx
-            else
-                coords.x = 0
-            end
-        else
-            coords.x = dx * args.x
-        end
-    end
-    if args.y then
-        if type(args.x) == 'string' then
-            if args.y == 'top' then
-                coords.y = 0
-            elseif args.y == 'bottom' then
-                coords.y = dy * maxy
-            else
-                coords.y = 0
-            end
-        else
-            coords.y = dy * args.y
-        end
-    end
-    return coords
-end
-
-tai.init = function ()
+tai.init_items = function ()
     local count = 0
     local modname = ''
     local modnames = {}
-
-    if minetest.get_modpath('sfinv') and sfinv then
-        sfinv.enabled = false
-    end
     for name,def in pairs(minetest.registered_items) do
         if name ~= '' then
             if not (def.groups.not_in_creative_inventory == 1) or tai.is_allowed_item(name) then
@@ -142,7 +91,43 @@ tai.init = function ()
     for k,v in pairs(modnames) do
         table.insert(tai.mods,k)
     end
+    table.sort(tai.items)
     table.sort(tai.mods)
     tai.config.total = count
     minetest.log("info","[TAI] Found "..count.." registered items in "..#tai.mods.." mods.")
+end
+
+tai.init_groups = function ()
+    local def
+    for _, name in ipairs(tai.items) do
+        def = minetest.registered_items[name]
+        if def.groups then
+            for group, val in pairs(def.groups) do
+                if tai.groups[group] == nil then
+                    tai.groups[group] = name
+                end
+            end
+        end
+    end
+end
+
+tai.init = function ()
+    if minetest.get_modpath('sfinv') and sfinv then
+        sfinv.enabled = false
+    end
+    tai.init_items()
+    tai.init_groups()
+    tai.do_action('init', tai.config)
+end
+
+tai.get_items_in_group = function (group)
+	local items = {}
+    local def
+	for index, itemname in ipairs(tai.items) do
+        def = minetest.registered_items[itemname]
+		if def.groups[group] then
+            items[#items + 1] = itemname
+        end
+	end
+	return items
 end

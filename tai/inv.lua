@@ -66,16 +66,17 @@ inv.items = function(cfg)
 
     table.sort(creative_list)
 
-    if cfg.page < 0 then
-        cfg.page = 0
-    end
-
     maxpages = math.floor(#creative_list/total)
     if #creative_list % total == 0 then
         maxpages = maxpages - 1
     end
-    if cfg.page >= maxpages then
+
+    if cfg.page < 0 then
         cfg.page = maxpages
+    end
+
+    if cfg.page > maxpages then
+        cfg.page = 0
     end
 
     index = total * cfg.page

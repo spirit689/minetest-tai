@@ -1,9 +1,9 @@
-Modpack Minetest TAI mod [0.1.0]
+Modpack Minetest TAI mod [0.1.4]
 ================================
 
 [mod] TAI [tai]
 -------------------
-Just simple inventory mod. Allows you to take any registered item in the game.
+Just simple inventory mod. Allows you to take any registered item in the game and view recipes.
 
 #### Features
 * 3d_armor support

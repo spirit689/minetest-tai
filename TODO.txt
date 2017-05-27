@@ -1,4 +1,9 @@
+-setting to take items by one
+-view history
+-groups view
+-replacement in recipes
 -additional actions (eg time, weather)
--creative mode support
--player privilegies
--something like crafting guide
+?"workbench" ie press Craft and see what is missing
+?what with the colour options
+?the mining level for ores and drops
+?crafting in the world (water + lava = obsidian)
