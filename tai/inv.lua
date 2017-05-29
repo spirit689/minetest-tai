@@ -38,7 +38,9 @@ end
 
 inv.mods = function(cfg)
     local formspec = { 'tableoptions[background=#282C34FF;border=false;highlight=#4D78CCFF]' }
-    formspec[#formspec + 1] = 'table[0,0;7.8,8.8;tai_mod;'..table.concat(tai.mods, ",")..';'..cfg.category..']'
+    formspec[#formspec + 1] = 'table[0,0;7.8,7.8;tai_mod;'..table.concat(tai.mods, ",")..';'..cfg.category..']'
+    formspec[#formspec + 1] = tai.inv_button_big('tai_modcancel', 0.3, 9, 'Cancel')
+    formspec[#formspec + 1] = tai.inv_button_big('tai_modsearch', 5.2, 9, 'OK')
     return table.concat(formspec, '')
 end
 

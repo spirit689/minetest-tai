@@ -20,6 +20,11 @@ tai.inv_button = function (id, x, y, caption)
     return 'image_button['..tostring(x * dx)..','..tostring(y * dy)..';0.9,0.85;tai_slot.png;'..id..';'..minetest.formspec_escape(caption)..';false;false;tai_slot_active.png]'
 end
 
+tai.inv_button_big = function (id, x, y, caption)
+    local dx, dy = 0.792, 0.9
+    return 'image_button['..tostring(x * dx)..','..tostring(y * dy)..';3.6,0.85;tai_button.png;'..id..';'..minetest.formspec_escape(caption)..';false;false;tai_button_active.png]'
+end
+
 -- return small grid (10x9) coords
 tai.inv_coords = function (args)
     local dx, dy = 0.792, 0.9

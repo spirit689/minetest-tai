@@ -2,6 +2,7 @@ v0.1.4
 -'creative' privilege
 -main menu colors settings
 -crafting guide
+-ok and cancel buttons to modlist view
 v0.1.3
 -code rework
 -mod filter

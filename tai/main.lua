@@ -17,6 +17,7 @@ tai.add_action('tai_next', function(cfg, player, fields)
 end)
 
 tai.add_action('tai_showmods', function(cfg, player, fields)
+    cfg.oldfilter = cfg.filter
     cfg.formspec.mods = 1
     cfg.formspec.items = 0
     cfg.formspec.player = 0
@@ -25,16 +26,32 @@ end)
 tai.add_action('tai_mod', function(cfg, player, fields)
     if fields["tai_mod"] ~= '' then
         evt = minetest.explode_table_event(fields["tai_mod"])
-        if evt.type == "DCL" then
+        if evt.type == "CHG" then
             cfg.filter = tai.mods[tonumber(evt.row)]
             cfg.category = evt.row
+        end
+        if evt.type == "DCL" then
             cfg.formspec.items = 1
             cfg.formspec.player = 1
             cfg.formspec.mods = 0
-            cfg.tab = 2
             cfg.page = 0
         end
     end
+end)
+
+tai.add_action('tai_modsearch', function(cfg, player, fields)
+    cfg.formspec.items = 1
+    cfg.formspec.player = 1
+    cfg.formspec.mods = 0
+    cfg.page = 0
+end)
+
+tai.add_action('tai_modcancel', function(cfg, player, fields)
+    cfg.filter = cfg.oldfilter
+    cfg.formspec.items = 1
+    cfg.formspec.player = 1
+    cfg.formspec.mods = 0
+    cfg.page = 0
 end)
 
 tai.add_action('tai_search', function(cfg, player, fields)
