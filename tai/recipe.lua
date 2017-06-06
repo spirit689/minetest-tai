@@ -1,43 +1,3 @@
-tai.inv.recipe = function (cfg)
-    local formspec = {}
-    local craft_item = cfg.recipe.item
-    local recipes, craft_type
-    local type_index, recipe_index = cfg.recipe.typeindex,  cfg.recipe.index
-    local pos
-    if type_index < 1 then
-        type_index = #tai.craft_recipe[craft_item]
-    end
-    if type_index > #tai.craft_recipe[craft_item] then
-        type_index = 1
-    end
-    cfg.recipe.typeindex = type_index
-    recipes = tai.craft_recipe[craft_item][type_index].recipes
-    craft_type = tai.craft_recipe[craft_item][type_index].craft_type
-    if recipe_index < 1 then
-        recipe_index = #recipes
-    end
-    if recipe_index > #recipes then
-        recipe_index = 1
-    end
-    cfg.recipe.index = recipe_index
-    formspec[#formspec + 1] = tai.inv_button('tai_recipe_hide', 9, 0, 'X')
-    formspec[#formspec + 1] = tai.inv_button('tai_crafttype_next', 8, 0, '>>')
-    formspec[#formspec + 1] = tai.inv_button('tai_crafttype_prev', 0, 0, '<<')
-    formspec[#formspec + 1] = 'label[3,0.15;'..tai.craft_type[craft_type].caption..']'
-
-    formspec[#formspec + 1] = tai.inv_button('tai_craft_next', 9, 1, '>>')
-    formspec[#formspec + 1] = tai.inv_button('tai_craft_prev', 8, 1, '<<')
-    pos = tai.inv_coords({x = 4, y = 1.1})
-    formspec[#formspec + 1] = 'label['..pos.x..','..pos.y..';'..recipe_index..'/'..#recipes..']'
-
-    formspec[#formspec + 1] = 'box[0,'..tostring(pos.y - 0.07)..';6.2,0.7;'..tai.config.slot_border..']'
-    formspec[#formspec + 1] = tai.craft_type[craft_type].formspec(recipes[recipe_index])
-    formspec[#formspec + 1] = 'box[0,6.3;7.8,0.7;'..tai.config.slot_border..']'
-    formspec[#formspec + 1] = 'label[0.4,6.4;'..ItemStack(craft_item):get_definition().description..' ('..core.colorize('#00FF00', ItemStack(craft_item):get_name())..')]'
-
-    return table.concat(formspec, "")
-end
-
 local function inv_crafting(recipe)
     local n, dx, dy, pos
     local formspec = {}
@@ -68,7 +28,7 @@ local function inv_crafting(recipe)
     end
     dx = 5 - (width + 2) / 2
     dy = 4.5 - width / 2 -- ( 2.7(3rd row) + 6.3(dark line) ) / 2
-    formspec[#formspec + 1] = tai.inv_items_list(items, {x = dx, y = dy, length = math.pow(width, 2), cols = width})
+    formspec[#formspec + 1] = tai.inv_items_list(items, {x = dx, y = dy, length = math.pow(width, 2), cols = width, empty = true})
     pos = tai.inv_coords({x = dx + width, y = dy + width / 2 - 0.3})
     formspec[#formspec + 1] = 'image['..pos.x..','..pos.y..';1,0.5;tai_arrow.png]'
     formspec[#formspec + 1] = tai.inv_items_list({ output:get_name() }, {x = dx + width + 1, y = dy + width / 2 - 0.5, length = 1, cols = 1})
@@ -122,38 +82,8 @@ tai.add_action('tai_recipe_hide', function (cfg, player, fields)
     cfg.formspec.player = 1
     cfg.formspec.items = 1
     cfg.formspec.recipe = 0
-    cfg.recipe.show = 0
-end)
-
-tai.add_action('tai_item', function (cfg, player, fields)
-    if minetest.check_player_privs(player, {creative = true}) then
-        return
-    end
-    local craft_item = fields.item
-    if tai.craft_recipe[craft_item] then
-        cfg.formspec.player = 0
-        cfg.formspec.items = 0
-        cfg.formspec.recipe = 1
-        cfg.recipe.show = 1
-        cfg.recipe.item = craft_item
-    end
-end)
-
-tai.add_action('tai_tab', function (cfg, player, fields)
-    if cfg.tab == 2 then
-        if cfg.recipe.show == 1 then
-            cfg.formspec.recipe = 1
-            cfg.formspec.items = 0
-            cfg.formspec.player = 0
-        end
-    end
-end)
-
-tai.add_action('init_player', function (cfg)
-    cfg.recipe = {
-        typeindex = 1,
-        index = 1
-    }
+    cfg.recipe.show = false
+    cfg.recipe.item = ''
 end)
 
 tai.add_action('init', function (cfg)

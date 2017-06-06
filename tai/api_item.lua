@@ -2,7 +2,12 @@ tai.give_item = function (player, item)
     local player_name = player:get_player_name()
     local inventory = player:get_inventory()
     local s = ItemStack(item)
-    inventory:add_item("main", {name = item, count = s:get_stack_max()})
+    if inventory:room_for_item("main", s) then
+        inventory:add_item("main", {name = item, count = s:get_stack_max()})
+        minetest.chat_send_player(player_name, 'TAI: '..s:get_stack_max()..' '..item..' given to '..player_name..'.')
+    else
+        minetest.chat_send_player(player_name, 'TAI: Your inventory is full.')
+    end
 end
 
 tai.is_allowed_item = function(name)
@@ -18,6 +23,14 @@ end
 tai.inv_button = function (id, x, y, caption)
     local dx, dy = 0.792, 0.9
     return 'image_button['..tostring(x * dx)..','..tostring(y * dy)..';0.9,0.85;tai_slot.png;'..id..';'..minetest.formspec_escape(caption)..';false;false;tai_slot_active.png]'
+end
+
+tai.inv_item_button = function (id, x, y, itemname)
+    local dx, dy = 0.792, 0.9
+    local x1 = x * dx
+    local y1 = y * dy
+    return 'image_button['..tostring(x1)..','..tostring(y1)..';0.9,0.85;tai_slot.png;'..id..';;false;false;tai_slot_active.png]'..
+    'item_image['..tostring(x1 + 0.1)..','..tostring(y1 + 0.1)..';0.63,0.6;'..itemname..']'
 end
 
 tai.inv_button_big = function (id, x, y, caption)
@@ -78,7 +91,9 @@ tai.inv_items_list = function (items, args)
             formspec[#formspec + 1] = 'image_button['..x..','..y..';'..w..','..h..';tai_slot.png;tai_item:'..itemname..';;false;false;tai_slot_active.png]'
             formspec[#formspec + 1] = 'tooltip[tai_item:'..itemname..';'..itemcaption..']'
         else
-            formspec[#formspec + 1] = 'image['..x..','..y..';'..w..','..h..';tai_slot.png]'
+            if args.empty then
+                formspec[#formspec + 1] = 'image['..x..','..y..';'..w..','..h..';tai_slot.png]'
+            end
         end
         x = x + dx
         if i % cols == 0 then

@@ -8,6 +8,11 @@ tai.register_tab({
     name = 'Items',
 })
 
+tai.register_tab({
+    index = 3,
+    name = 'Settings',
+})
+
 tai.add_action('tai_prev', function(cfg, player, fields)
     cfg.page = cfg.page - 1
 end)
@@ -78,7 +83,15 @@ tai.add_action('tai_tab', function(cfg, player, fields)
         cfg.formspec.player = 1
     elseif cfg.tab == 2 then
         cfg.formspec.items = 1
-        cfg.formspec.player = 1
+        if cfg.recipe.show and cfg.recipe.enabled then
+            cfg.formspec.recipe = 1
+            cfg.formspec.items = 0
+            cfg.formspec.player = 0
+        else
+            cfg.formspec.player = 1
+        end
+    elseif cfg.tab == 3 then
+        cfg.formspec.settings = 1
     end
 end)
 
@@ -90,12 +103,45 @@ tai.add_action('receive_fields', function(cfg, player, fields)
     for field, val in pairs(fields) do
         if field:find('tai_item:', 1, true) then
             tai.do_action('tai_item', cfg, player, {item=field:sub(field:find(':', 1, true)+1)})
+        elseif field:find('tai_give:', 1, true) then
+            tai.do_action('tai_give', cfg, player, {item=field:sub(field:find(':', 1, true)+1)})
         end
     end
 end)
 
 tai.add_action('tai_item', function (cfg, player, fields)
-    if minetest.check_player_privs(player, {creative = true}) then
-        tai.give_item(player, fields.item)
+    local craft_item = fields.item
+    if tai.craft_recipe[craft_item] and cfg.recipe.enabled then
+        cfg.formspec.player = 0
+        cfg.formspec.items = 0
+        cfg.formspec.recipe = 1
+        cfg.recipe.show = true
+        cfg.recipe.item = craft_item
+    else
+        if minetest.check_player_privs(player, {creative = true}) then
+            tai.give_item(player, fields.item)
+        end
     end
+end)
+
+tai.add_action('tai_give', function (cfg, player, fields)
+    tai.give_item(player, fields.item)
+end)
+
+tai.add_action('tai_setting_recipe', function(cfg, player, fields)
+    if cfg.recipe.enabled then
+        cfg.recipe.enabled = false
+    else
+        cfg.recipe.enabled = true
+    end
+end)
+
+tai.add_action('tai_setting_creative', function(cfg, player, fields)
+    local privs = minetest.get_player_privs(cfg.player_name)
+    if privs.creative then
+        privs.creative = nil
+    else
+        privs.creative = true
+    end
+    minetest.set_player_privs(cfg.player_name, privs)
 end)

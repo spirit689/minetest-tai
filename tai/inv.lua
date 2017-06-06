@@ -105,10 +105,11 @@ inv.items = function(cfg)
     end
 
     y = dy * rows
+
     --search field
     formspec[#formspec + 1] = 'field[0.3,'..tostring(y + 0.27)..';3.3,1;tai_search;;'..minetest.formspec_escape(cfg.filter)..']'
-    formspec[#formspec + 1] = 'image_button['..tostring(4 * dx)..','..tostring(y)..';0.9,0.85;tai_slot.png;tai_resetsearch;X;false;false;tai_slot_active.png]'
-    formspec[#formspec + 1] = 'image_button['..tostring(5 * dx)..','..tostring(y)..';0.9,0.85;tai_slot.png;tai_showmods;?;false;false;tai_slot_active.png]'
+    formspec[#formspec + 1] = tai.inv_button('tai_resetsearch', 4, 4, 'X')
+    formspec[#formspec + 1] = tai.inv_button('tai_showmods', 5, 4, '?')
     formspec[#formspec + 1] = 'tooltip[tai_resetsearch;Reset search]'
     formspec[#formspec + 1] = 'tooltip[tai_showmods;Mod list]'
     formspec[#formspec + 1] = 'field_close_on_enter[tai_search;false]'
@@ -116,11 +117,69 @@ inv.items = function(cfg)
     --prev/next
     if #creative_list > total then
         formspec[#formspec + 1] = 'label['..tostring(6 * dx + 0.2)..','..tostring(y + 0.2)..';'..tostring(cfg.page + 1)..'/'..tostring(maxpages + 1)..']'
-        formspec[#formspec + 1] = 'image_button['..tostring(8 * dx)..','..tostring(y)..';0.9,0.85;tai_slot.png;tai_prev;<<;false;false;tai_slot_active.png]'
-        formspec[#formspec + 1] = 'image_button['..tostring(9 * dx)..','..tostring(y)..';0.9,0.85;tai_slot.png;tai_next;>>;false;false;tai_slot_active.png]'
+        formspec[#formspec + 1] = tai.inv_button('tai_prev', 8, 4, '<<')
+        formspec[#formspec + 1] = tai.inv_button('tai_next', 9, 4, '>>')
         formspec[#formspec+1] = 'tooltip[tai_prev;Previous page]'
         formspec[#formspec+1] = 'tooltip[tai_next;Next Page]'
     end
 
     return table.concat(formspec, "")
+end
+
+tai.inv.recipe = function (cfg)
+    local formspec = {}
+    local craft_item = cfg.recipe.item
+    local recipes, craft_type
+    local type_index, recipe_index = cfg.recipe.typeindex,  cfg.recipe.index
+    local pos
+    if type_index < 1 then
+        type_index = #tai.craft_recipe[craft_item]
+    end
+    if type_index > #tai.craft_recipe[craft_item] then
+        type_index = 1
+    end
+    cfg.recipe.typeindex = type_index
+    recipes = tai.craft_recipe[craft_item][type_index].recipes
+    craft_type = tai.craft_recipe[craft_item][type_index].craft_type
+    if recipe_index < 1 then
+        recipe_index = #recipes
+    end
+    if recipe_index > #recipes then
+        recipe_index = 1
+    end
+    cfg.recipe.index = recipe_index
+    formspec[#formspec + 1] = tai.inv_button('tai_recipe_hide', 9, 0, 'X')
+    formspec[#formspec + 1] = tai.inv_button('tai_crafttype_next', 8, 0, '>>')
+    formspec[#formspec + 1] = tai.inv_button('tai_crafttype_prev', 0, 0, '<<')
+    formspec[#formspec + 1] = 'label[3,0.15;'..tai.craft_type[craft_type].caption..']'
+
+    formspec[#formspec + 1] = tai.inv_button('tai_craft_next', 9, 1, '>>')
+    formspec[#formspec + 1] = tai.inv_button('tai_craft_prev', 8, 1, '<<')
+    pos = tai.inv_coords({x = 4, y = 1.1})
+    formspec[#formspec + 1] = 'label['..pos.x..','..pos.y..';'..recipe_index..'/'..#recipes..']'
+
+    formspec[#formspec + 1] = 'box[0,'..tostring(pos.y - 0.07)..';6.2,0.7;'..tai.config.slot_border..']'
+    formspec[#formspec + 1] = tai.craft_type[craft_type].formspec(recipes[recipe_index])
+    formspec[#formspec + 1] = 'box[0,6.3;7.8,0.7;'..tai.config.slot_border..']'
+    formspec[#formspec + 1] = 'label[0.4,6.4;'..ItemStack(craft_item):get_definition().description..' ('..core.colorize('#00FF00', ItemStack(craft_item):get_name())..')]'
+    if minetest.check_player_privs(cfg.player_name, {creative = true}) then
+        formspec[#formspec + 1] = tai.inv_item_button('tai_give:'..craft_item, 9, 2, craft_item)
+        formspec[#formspec + 1] = 'tooltip[tai_give:'..craft_item..';Take]'
+    end
+    return table.concat(formspec, "")
+end
+
+tai.inv.settings = function (cfg)
+    local formspec = {}
+    if cfg.recipe.enabled then
+        formspec[#formspec + 1] = tai.inv_button_big('tai_setting_recipe', 0, 0, 'Recipe: On')
+    else
+        formspec[#formspec + 1] = tai.inv_button_big('tai_setting_recipe', 0, 0, 'Recipe: Off')
+    end
+    if minetest.check_player_privs(cfg.player_name, {creative = true}) then
+        formspec[#formspec + 1] = tai.inv_button_big('tai_setting_creative', 0, 1, 'Creative: On')
+    else
+        formspec[#formspec + 1] = tai.inv_button_big('tai_setting_creative', 0, 1, 'Creative: Off')
+    end
+    return table.concat(formspec, '')
 end

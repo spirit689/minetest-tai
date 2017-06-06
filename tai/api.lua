@@ -68,6 +68,10 @@ tai.init_player = function(player_name)
         formspec = {
             player = 1,
             craft = 1
+        },
+        recipe = {
+            typeindex = 1,
+            index = 1
         }
     }
 end
