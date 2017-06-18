@@ -11,7 +11,7 @@ tai.build_formspec = function(player_name)
 end
 
 tai.setting_get = function(setting, default)
-    local val = minetest.setting_get(setting)
+    local val = minetest.settings:get(setting)
     if val and val ~= '' then
         return val
     else
