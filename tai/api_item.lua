@@ -83,8 +83,10 @@ tai.inv_items_list = function (items, args)
                 formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..tai.groups[groups[1]]..']'
             else
                 def = minetest.registered_items[itemname]
-                if def.description and def.description ~= '' then
+                if def and def.description and def.description ~= '' then
                     itemcaption = minetest.formspec_escape(def.description..'\n'..core.colorize('#00FF00',itemname))
+                else
+                    itemcaption = minetest.formspec_escape('Unknown\n'..core.colorize('#FF0000',itemname))
                 end
                 formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..itemname..']'
             end
