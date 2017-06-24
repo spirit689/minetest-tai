@@ -45,7 +45,7 @@ minetest.register_on_joinplayer(function(player)
     minetest.after(tai.config.delay, function()
         local name = player:get_player_name()
         local privs = minetest.get_player_privs(name)
-        if minetest.check_player_privs(player, {creative = true}) or minetest.setting_getbool("creative_mode") then
+        if minetest.check_player_privs(player, {creative = true}) or minetest.settings:get_bool("creative_mode") then
             privs.creative = true
         end
         minetest.set_player_privs(name, privs)
