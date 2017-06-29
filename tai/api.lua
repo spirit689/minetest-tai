@@ -124,12 +124,21 @@ tai.init = function ()
     tai.do_action('init', tai.config)
 end
 
-tai.get_items_in_group = function (group)
+tai.get_items_in_group = function (groups)
 	local items = {}
     local def
+    local check
 	for index, itemname in ipairs(tai.items) do
         def = minetest.registered_items[itemname]
-		if def.groups[group] then
+        check = true
+        for i, g in ipairs(groups) do
+            -- if def.groups[g] then print(dump(def.groups)) end
+            if not def.groups[g] then
+                check = false
+            end
+        end
+        if check == true then
+            print(dump(itemname))
             items[#items + 1] = itemname
         end
 	end

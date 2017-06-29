@@ -118,7 +118,7 @@ tai.add_action('tai_item', function (cfg, player, fields)
         cfg.recipe.show = true
         cfg.recipe.item = craft_item
     else
-        if minetest.check_player_privs(player, {creative = true}) then
+        if minetest.check_player_privs(player, {creative = true}) and not craft_item:find('group:', 1, true) then
             tai.give_item(player, fields.item)
         end
     end

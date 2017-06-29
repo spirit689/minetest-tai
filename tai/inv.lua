@@ -46,18 +46,11 @@ end
 
 inv.items = function(cfg)
     local creative_list = {}
-    local dx, dy = 0.792, 0.9
-    local x, y = 0, 0
-    local w, h = 0.9, 0.85
-    local cols, rows = 10, 4
-    local total = cols * rows
+    local total = 40
     local index = 1
     local maxpages = 0
     local formspec = {}
     local def = {}
-
-    local itemname = ''
-    local itemcaption = ''
 
     for i, name in ipairs(tai.items) do
         def = minetest.registered_items[name]
@@ -83,40 +76,26 @@ inv.items = function(cfg)
 
     index = total * cfg.page
 
-    for i=1,total do
-        if creative_list[index + i] then
-            itemname = creative_list[index + i]
-            def = minetest.registered_items[creative_list[index + i]]
-            if def.description and def.description ~= '' then
-                -- itemcaption = def.description..minetest.formspec_escape(' ['..itemname:sub(1, itemname:find(':', 1, true)-1)..']')
-                itemcaption = minetest.formspec_escape(def.description..'\n'..core.colorize('#00FF00',itemname))
-            else
-                itemcaption = minetest.formspec_escape('['..itemname..']')
-            end
-            formspec[#formspec + 1] = 'image_button['..x..','..y..';'..w..','..h..';tai_slot.png;tai_item:'..itemname..';;false;false;tai_slot_active.png]'
-            formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..itemname..']'
-            formspec[#formspec + 1] = 'tooltip[tai_item:'..itemname..';'..itemcaption..']'
-            x = x + dx
-            if i % cols == 0 then
-                x = 0
-                y = y + dy
-            end
-        end
-    end
+    formspec[#formspec + 1] = tai.inv_items_list(creative_list, {
+        index = 40 * cfg.page + 1,
+        length = index + 40,
+        x = 0,
+        y = 0,
+        cols = 10,
+        empty = false
+    })
 
-    y = dy * rows
-
+    local pos = tai.inv_coords({x=6, y=4})
     --search field
-    formspec[#formspec + 1] = 'field[0.3,'..tostring(y + 0.27)..';3.3,1;tai_search;;'..minetest.formspec_escape(cfg.filter)..']'
+    formspec[#formspec + 1] = 'field[0.3,'..tostring(pos.y + 0.27)..';3.3,1;tai_search;;'..minetest.formspec_escape(cfg.filter)..']'
     formspec[#formspec + 1] = tai.inv_button('tai_resetsearch', 4, 4, 'X')
     formspec[#formspec + 1] = tai.inv_button('tai_showmods', 5, 4, '?')
     formspec[#formspec + 1] = 'tooltip[tai_resetsearch;Reset search]'
     formspec[#formspec + 1] = 'tooltip[tai_showmods;Mod list]'
     formspec[#formspec + 1] = 'field_close_on_enter[tai_search;false]'
-
     --prev/next
     if #creative_list > total then
-        formspec[#formspec + 1] = 'label['..tostring(6 * dx + 0.2)..','..tostring(y + 0.2)..';'..tostring(cfg.page + 1)..'/'..tostring(maxpages + 1)..']'
+        formspec[#formspec + 1] = 'label['..tostring(pos.x + 0.2)..','..tostring(pos.y + 0.2)..';'..tostring(cfg.page + 1)..'/'..tostring(maxpages + 1)..']'
         formspec[#formspec + 1] = tai.inv_button('tai_prev', 8, 4, '<<')
         formspec[#formspec + 1] = tai.inv_button('tai_next', 9, 4, '>>')
         formspec[#formspec+1] = 'tooltip[tai_prev;Previous page]'
@@ -126,7 +105,7 @@ inv.items = function(cfg)
     return table.concat(formspec, "")
 end
 
-tai.inv.recipe = function (cfg)
+inv.recipe = function (cfg)
     local formspec = {}
     local craft_item = cfg.recipe.item
     local recipes, craft_type
@@ -169,7 +148,7 @@ tai.inv.recipe = function (cfg)
     return table.concat(formspec, "")
 end
 
-tai.inv.settings = function (cfg)
+inv.settings = function (cfg)
     local formspec = {}
     if cfg.recipe.enabled then
         formspec[#formspec + 1] = tai.inv_button_big('tai_setting_recipe', 0, 0, 'Recipe: On')

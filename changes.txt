@@ -1,3 +1,7 @@
+-you won't be able to take unknown item with the 'group:' names
+-if item is in multiple groups it appears correctly in the recipe
+-one function to show items list
+-txt file with list of callbacks and formspec parts
 v0.1.4
 -'creative' privilege
 -main menu colors settings

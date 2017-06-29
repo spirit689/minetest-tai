@@ -1,0 +1,43 @@
+Hooks list
+
+[tai]
+Callbacks:
+init: After mod init
+receive_fields: After receive formspec fields before any callback
+init_player: After join player and add player config
+tai_prev: Items list - previous page
+tai_next: Items list - next page
+tai_search: Items list - Search field
+tai_resetsearch: Items list - Search reset
+tai_showmods: Mod list
+tai_mod: Mod list - select item
+tai_modsearch: Mod list - OK
+tai_modcancel: Mod list - Cancel
+tai_tab: Tabs - Switch tab
+tai_item: Item button pressed
+tai_setting_recipe: Settings - Recipe Button
+tai_setting_creative: Settings - Creative Button
+tai_give: Recipe - Take item
+tai_crafttype_next: Recipe - Next craft type
+tai_crafttype_prev: Recipe - Previous craft type
+tai_craft_next: Recipe - Next recipe
+tai_craft_prev: Recipe - Previous recipe
+
+Formspec parts:
+main: Main window
+pages: Tabs list
+player: Player inventory
+craft: Crafting inventory
+mods: Mods filter list
+items: Items list
+recipe: Recipe view
+settings: Settings view
+
+[tai_armor]
+Added callbacks:
+tai_togglearmor: Toggle armor stats
+
+Added formspec parts:
+armor: Armor inventory & player image
+armorstats: Armor stats list
+armorcraft: Crafting inventory

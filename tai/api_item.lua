@@ -78,9 +78,13 @@ tai.inv_items_list = function (items, args)
         itemname = items[i]
         if itemname and itemname ~= '' then
             if itemname:find('group:', 1, true) then
-                itemcaption = minetest.formspec_escape(core.colorize('#00FF00', string.gsub(itemname, ',', '\ngroup:')))
                 groups = itemname:sub(itemname:find(':', 1, true)+1):split(',')
-                formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..tai.groups[groups[1]]..']'
+                itemcaption = minetest.formspec_escape(core.colorize('#00FF00', string.gsub(itemname, ',', '\ngroup:')))
+                if #groups > 1 then
+                    formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..tai.get_items_in_group(groups)[1]..']'
+                else
+                    formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..tai.groups[groups[1]]..']'
+                end
             else
                 def = minetest.registered_items[itemname]
                 if def and def.description and def.description ~= '' then
