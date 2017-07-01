@@ -39,10 +39,10 @@ local function inv_crafting(recipe)
     return table.concat(formspec,'')
 end
 
-tai.register_craft_type('normal', 'Normal', inv_crafting)
-tai.register_craft_type('shapeless', 'Shapeless', inv_crafting)
+tai.register_craft_type('normal', {caption = 'Normal', icon = 'default_tool_diamondpick.png'}, inv_crafting)
+tai.register_craft_type('shapeless', {caption = 'Shapeless', icon = '[inventorycube{default_chest_top.png{default_chest_front.png{default_chest_side.png'}, inv_crafting)
 
-tai.register_craft_type('cooking', 'Cooking', function (recipe)
+tai.register_craft_type('cooking', {caption = 'Cooking', icon = '[inventorycube{default_furnace_top.png{default_furnace_front.png{default_furnace_side.png'}, function (recipe)
     local formspec = {}
     local output = ItemStack(recipe.output)
 
@@ -60,14 +60,9 @@ tai.register_craft_type('cooking', 'Cooking', function (recipe)
 end)
 
 -- navigation
-tai.add_action('tai_crafttype_next', function (cfg, player, fields)
-    cfg.recipe.typeindex = cfg.recipe.typeindex + 1
+tai.add_action('tai_crafttype', function (cfg, player, fields)
     cfg.recipe.index = 1
-end)
-
-tai.add_action('tai_crafttype_prev', function (cfg, player, fields)
-    cfg.recipe.typeindex = cfg.recipe.typeindex - 1
-    cfg.recipe.index = 1
+    cfg.recipe.typeindex = tonumber(fields.typeindex)
 end)
 
 tai.add_action('tai_craft_next', function (cfg, player, fields)

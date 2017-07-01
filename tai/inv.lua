@@ -13,6 +13,7 @@ inv.main = function(cfg)
     }
     formspec[#formspec+1] = 'size[8,8.6]'
     formspec[#formspec+1] = 'bgcolor['..cfg.bgcolor..';false]'
+    formspec[#formspec+1] = 'background[0,0;0,0;tai_bg.png;true]'
     formspec[#formspec+1] = 'listcolors['..table.concat(colors, ";")..']'
     return table.concat(formspec, "")
 end
@@ -127,20 +128,34 @@ inv.recipe = function (cfg)
         recipe_index = 1
     end
     cfg.recipe.index = recipe_index
+
+    for i, def in pairs(tai.craft_recipe[craft_item]) do
+        pos = tai.inv_coords({x = i - 1})
+        if def.craft_type == craft_type then
+            formspec[#formspec + 1] = 'image['..tostring(pos.x)..',0;0.9,0.83;tai_slot_active.png]'
+        else
+            formspec[#formspec + 1] = tai.inv_button('tai_crafttype:'..i, i - 1, 0, '')
+        end
+        formspec[#formspec + 1] = 'image['..tostring(pos.x + 0.1)..',0.1;0.63,0.6;'..tai.craft_type[def.craft_type].icon..']'
+        formspec[#formspec + 1] = 'tooltip[tai_crafttype:'..i..';'..tai.craft_type[def.craft_type].caption..']'
+    end
     formspec[#formspec + 1] = tai.inv_button('tai_recipe_hide', 9, 0, 'X')
-    formspec[#formspec + 1] = tai.inv_button('tai_crafttype_next', 8, 0, '>>')
-    formspec[#formspec + 1] = tai.inv_button('tai_crafttype_prev', 0, 0, '<<')
-    formspec[#formspec + 1] = 'label[3,0.15;'..tai.craft_type[craft_type].caption..']'
 
-    formspec[#formspec + 1] = tai.inv_button('tai_craft_next', 9, 1, '>>')
-    formspec[#formspec + 1] = tai.inv_button('tai_craft_prev', 8, 1, '<<')
-    pos = tai.inv_coords({x = 4, y = 1.1})
-    formspec[#formspec + 1] = 'label['..pos.x..','..pos.y..';'..recipe_index..'/'..#recipes..']'
+    pos = tai.inv_coords({y = 1.1})
+    formspec[#formspec + 1] = 'label[3,'..pos.y..';'..core.colorize('#00FF00', tai.craft_type[craft_type].caption)..']'
+    formspec[#formspec + 1] = 'box[0,'..tostring(pos.y - 0.07)..';7.83,0.7;'..tai.config.slot_border..']'
 
-    formspec[#formspec + 1] = 'box[0,'..tostring(pos.y - 0.07)..';6.2,0.7;'..tai.config.slot_border..']'
     formspec[#formspec + 1] = tai.craft_type[craft_type].formspec(recipes[recipe_index])
-    formspec[#formspec + 1] = 'box[0,6.3;7.8,0.7;'..tai.config.slot_border..']'
-    formspec[#formspec + 1] = 'label[0.4,6.4;'..ItemStack(craft_item):get_definition().description..' ('..core.colorize('#00FF00', ItemStack(craft_item):get_name())..')]'
+
+    pos = tai.inv_coords({y = 7.1})
+    formspec[#formspec + 1] = 'label[3.5,'..pos.y..';'..recipe_index..'/'..#recipes..']'
+    formspec[#formspec + 1] = 'box[0,'..tostring(pos.y - 0.07)..';6.2,0.7;'..tai.config.slot_border..']'
+    formspec[#formspec + 1] = tai.inv_button('tai_craft_next', 9, 7, '>>')
+    formspec[#formspec + 1] = tai.inv_button('tai_craft_prev', 8, 7, '<<')
+
+    formspec[#formspec + 1] = 'box[0,7.1;7.83,0.7;'..tai.config.slot_border..']'
+    formspec[#formspec + 1] = 'label[0.4,7.2;'..ItemStack(craft_item):get_definition().description..' ('..core.colorize('#00FF00', ItemStack(craft_item):get_name())..')]'
+
     if minetest.check_player_privs(cfg.player_name, {creative = true}) then
         formspec[#formspec + 1] = tai.inv_item_button('tai_give:'..craft_item, 9, 2, craft_item)
         formspec[#formspec + 1] = 'tooltip[tai_give:'..craft_item..';Take]'

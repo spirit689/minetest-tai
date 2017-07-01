@@ -43,9 +43,10 @@ tai.register_craft = function (itemname, recipe)
     end
 end
 
-tai.register_craft_type = function (craft_type, caption, formspec)
+tai.register_craft_type = function (craft_type, def, formspec)
     tai.craft_type[craft_type] = {
-        caption = caption,
+        caption = def.caption,
+        icon = def.icon,
         formspec = formspec
     }
 end

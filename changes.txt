@@ -1,3 +1,4 @@
+-craft type icon buttons
 -you won't be able to take unknown item with the 'group:' names
 -if item is in multiple groups it appears correctly in the recipe
 -one function to show items list

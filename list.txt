@@ -18,8 +18,7 @@ tai_item: Item button pressed
 tai_setting_recipe: Settings - Recipe Button
 tai_setting_creative: Settings - Creative Button
 tai_give: Recipe - Take item
-tai_crafttype_next: Recipe - Next craft type
-tai_crafttype_prev: Recipe - Previous craft type
+tai_crafttype: Recipe - Select craft type
 tai_craft_next: Recipe - Next recipe
 tai_craft_prev: Recipe - Previous recipe
 

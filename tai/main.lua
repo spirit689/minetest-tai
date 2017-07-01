@@ -105,6 +105,8 @@ tai.add_action('receive_fields', function(cfg, player, fields)
             tai.do_action('tai_item', cfg, player, {item=field:sub(field:find(':', 1, true)+1)})
         elseif field:find('tai_give:', 1, true) then
             tai.do_action('tai_give', cfg, player, {item=field:sub(field:find(':', 1, true)+1)})
+        elseif field:find('tai_crafttype:', 1, true) then
+            tai.do_action('tai_crafttype', cfg, player, {typeindex=field:sub(field:find(':', 1, true)+1)})
         end
     end
 end)
