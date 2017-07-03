@@ -132,13 +132,11 @@ tai.get_items_in_group = function (groups)
         def = minetest.registered_items[itemname]
         check = true
         for i, g in ipairs(groups) do
-            -- if def.groups[g] then print(dump(def.groups)) end
             if not def.groups[g] then
                 check = false
             end
         end
         if check == true then
-            print(dump(itemname))
             items[#items + 1] = itemname
         end
 	end

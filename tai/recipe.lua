@@ -39,7 +39,7 @@ local function inv_crafting(recipe)
     return table.concat(formspec,'')
 end
 
-tai.register_craft_type('normal', {caption = 'Normal', icon = 'default_tool_diamondpick.png'}, inv_crafting)
+tai.register_craft_type('normal', {caption = 'Normal', icon = '[inventorycube{tai_workbench_top.png{tai_workbench_side.png{tai_workbench_side.png'}, inv_crafting)
 tai.register_craft_type('shapeless', {caption = 'Shapeless', icon = '[inventorycube{default_chest_top.png{default_chest_front.png{default_chest_side.png'}, inv_crafting)
 
 tai.register_craft_type('cooking', {caption = 'Cooking', icon = '[inventorycube{default_furnace_top.png{default_furnace_front.png{default_furnace_side.png'}, function (recipe)
@@ -98,7 +98,6 @@ tai.add_action('init', function (cfg)
     		end
     	end
     end
-    -- print(dump(tai.groups))
     print("[TAI] All recipes loaded in "..os.clock() - t1)
     -- override some group items
     tai.groups.wood = "default:wood"
