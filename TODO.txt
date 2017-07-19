@@ -1,21 +1,9 @@
--setting to take items by one
 -view history
--groups view
 -replacement in recipes
 -additional actions (eg time, weather)
-?"workbench" ie press Craft and see what is missing
+-item filter(somehow) by group, name, mod, recipe type
+-item usage mode
+-somewhere on 1 tab: clear inventory, workbench -> inventory
 ?what with the colour options
 ?the mining level for ores and drops
 ?crafting in the world (water + lava = obsidian)
-
--поиск по группам
--поиск по предмету ложим предмет в слот и переходим на вид "рецепты" со списком
--корректное отображение предметов в рецепте, если он из нескольких групп
--отдельная настройка для просмотра рецептов, будет кнопка "взять" на виде рецепт, если включена и есть креатив
--просмотр рецептов, где используется предмет(для топлива время горения)
--кнопки
-положить в верстак 1
-положить в верстак по максимуму
-скрафтить всё
-очистить верстак
-очистить инвентарь

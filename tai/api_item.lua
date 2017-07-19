@@ -25,12 +25,33 @@ tai.inv_button = function (id, x, y, caption)
     return 'image_button['..tostring(x * dx)..','..tostring(y * dy)..';0.9,0.85;tai_slot.png;'..id..';'..minetest.formspec_escape(caption)..';false;false;tai_slot_active.png]'
 end
 
-tai.inv_item_button = function (id, x, y, itemname)
+tai.inv_item_button = function (id, posx, posy, itemname)
     local dx, dy = 0.792, 0.9
-    local x1 = x * dx
-    local y1 = y * dy
-    return 'image_button['..tostring(x1)..','..tostring(y1)..';0.9,0.85;tai_slot.png;'..id..';;false;false;tai_slot_active.png]'..
-    'item_image['..tostring(x1 + 0.1)..','..tostring(y1 + 0.1)..';0.63,0.6;'..itemname..']'
+    local x = posx * dx
+    local y = posy * dy
+    local w, h = 0.9, 0.85
+    local formspec = {}
+    local itemcaption, def, groups
+    if itemname:find('group:', 1, true) then
+        groups = itemname:sub(itemname:find(':', 1, true)+1):split(',')
+        itemcaption = minetest.formspec_escape(core.colorize('#00FF00', string.gsub(itemname, ',', '\ngroup:')))
+        if #groups > 1 then
+            formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..tai.get_items_in_group(groups)[1]..']'
+        else
+            formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..tai.groups[groups[1]]..']'
+        end
+    else
+        def = minetest.registered_items[itemname]
+        if def and def.description and def.description ~= '' then
+            itemcaption = minetest.formspec_escape(def.description..'\n'..core.colorize('#00FF00',itemname))
+        else
+            itemcaption = minetest.formspec_escape('Unknown\n'..core.colorize('#FF0000',itemname))
+        end
+        formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..itemname..']'
+    end
+    formspec[#formspec + 1] = 'image_button['..x..','..y..';'..w..','..h..';tai_slot.png;'..id..';;false;false;tai_slot_active.png]'
+    formspec[#formspec + 1] = 'tooltip['..id..';'..itemcaption..']'
+    return table.concat(formspec, '')
 end
 
 tai.inv_button_big = function (id, x, y, caption)
@@ -57,9 +78,8 @@ tai.inv_items_list = function (items, args)
     local w, h = 0.9, 0.85
     local cols = args.cols
     local index, l
-    local x, y = args.x * dx, args.y * dy
+    local x, y = args.x, args.y
     local startx = x
-    local itemname, itemcaption, def, groups
     local formspec = {}
 
     if args.index then
@@ -77,34 +97,16 @@ tai.inv_items_list = function (items, args)
     for i=index,l do
         itemname = items[i]
         if itemname and itemname ~= '' then
-            if itemname:find('group:', 1, true) then
-                groups = itemname:sub(itemname:find(':', 1, true)+1):split(',')
-                itemcaption = minetest.formspec_escape(core.colorize('#00FF00', string.gsub(itemname, ',', '\ngroup:')))
-                if #groups > 1 then
-                    formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..tai.get_items_in_group(groups)[1]..']'
-                else
-                    formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..tai.groups[groups[1]]..']'
-                end
-            else
-                def = minetest.registered_items[itemname]
-                if def and def.description and def.description ~= '' then
-                    itemcaption = minetest.formspec_escape(def.description..'\n'..core.colorize('#00FF00',itemname))
-                else
-                    itemcaption = minetest.formspec_escape('Unknown\n'..core.colorize('#FF0000',itemname))
-                end
-                formspec[#formspec + 1] = 'item_image['..tostring(x + 0.1)..','..tostring(y + 0.1)..';'..tostring(w - 0.27)..','..tostring(h - 0.25)..';'..itemname..']'
-            end
-            formspec[#formspec + 1] = 'image_button['..x..','..y..';'..w..','..h..';tai_slot.png;tai_item:'..itemname..';;false;false;tai_slot_active.png]'
-            formspec[#formspec + 1] = 'tooltip[tai_item:'..itemname..';'..itemcaption..']'
+            formspec[#formspec + 1] = tai.inv_item_button('tai_item:'..itemname, x, y, itemname)
         else
             if args.empty then
-                formspec[#formspec + 1] = 'image['..x..','..y..';'..w..','..h..';tai_slot.png]'
+                formspec[#formspec + 1] = 'image['..tostring(x * dx)..','..tostring(y * dy)..';'..w..','..h..';tai_slot.png]'
             end
         end
-        x = x + dx
+        x = x + 1
         if i % cols == 0 then
             x = startx
-            y = y + dy
+            y = y + 1
         end
     end
 

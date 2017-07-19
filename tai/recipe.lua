@@ -44,6 +44,7 @@ tai.register_craft_type('shapeless', {caption = 'Shapeless', icon = '[inventoryc
 
 tai.register_craft_type('cooking', {caption = 'Cooking', icon = '[inventorycube{default_furnace_top.png{default_furnace_front.png{default_furnace_side.png'}, function (recipe)
     local formspec = {}
+    local pos = {}
     local output = ItemStack(recipe.output)
 
     formspec[#formspec + 1] = tai.inv_items_list(recipe.items, {x = 3, y = 4, length = 1, cols = 1})
@@ -86,7 +87,6 @@ tai.add_action('init', function (cfg)
     local t1
     local recipes
     local items, group
-    t1 = os.clock()
     -- load recipes
     for i,name in ipairs(tai.items) do
         recipes = minetest.get_all_craft_recipes(name)
@@ -98,7 +98,6 @@ tai.add_action('init', function (cfg)
     		end
     	end
     end
-    print("[TAI] All recipes loaded in "..os.clock() - t1)
     -- override some group items
     tai.groups.wood = "default:wood"
     tai.groups.stone = "default:cobble"

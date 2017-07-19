@@ -16,6 +16,9 @@ dofile(path..'/api_recipe.lua')
 dofile(path..'/inv.lua')
 dofile(path..'/main.lua')
 dofile(path..'/recipe.lua')
+if minetest.get_modpath('technic') then
+    dofile(path..'/recipe_technic.lua')
+end
 
 tai.config.delay = tai.setting_get('tai_delay_time', 5)
 tai.config.whitelist = tai.setting_get('tai_filters', ''):split(',')

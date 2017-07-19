@@ -1,17 +1,20 @@
 
-tai.register_craft = function (itemname, recipe)
-    -- TODO: fuel, toolrepair -> usage
+tai.register_craft = function (itemname, recipe, recipe_type)
     local craft_type
     local k = 0
     local index = 1
     local add_index = 1
 
     -- try to get recipe type: normal, shapeless, cooking, etc
-    if recipe.type ~= '' then
-        craft_type = recipe.type
-    end
-    if craft_type == 'normal' and recipe.width == 0 then
-        craft_type = 'shapeless'
+    if recipe_type and recipe_type ~= '' then
+        craft_type = recipe_type
+    else
+        if recipe.type ~= '' then
+            craft_type = recipe.type
+        end
+        if craft_type == 'normal' and recipe.width == 0 then
+            craft_type = 'shapeless'
+        end
     end
     -- add craft tai.craft_recipe[index] = { craft_type = craft_type, recipes = {...} }
     if tai.craft_type[craft_type] then

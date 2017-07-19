@@ -98,7 +98,7 @@ tai.init_items = function ()
     table.sort(tai.items)
     table.sort(tai.mods)
     tai.config.total = count
-    minetest.log("info","[TAI] Found "..count.." registered items in "..#tai.mods.." mods.")
+    print("[TAI] Found "..count.." registered items in "..#tai.mods.." mods.")
 end
 
 tai.init_groups = function ()
@@ -119,9 +119,11 @@ tai.init = function ()
     if minetest.get_modpath('sfinv') and sfinv then
         sfinv.enabled = false
     end
+    local t1 = os.clock()
     tai.init_items()
     tai.init_groups()
     tai.do_action('init', tai.config)
+    print("[TAI] Loaded in "..tostring(os.clock() - t1))
 end
 
 tai.get_items_in_group = function (groups)
