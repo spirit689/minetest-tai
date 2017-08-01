@@ -1,3 +1,5 @@
+-the function tai.add_action allows to assign multiple actions now
+-save all interface state and player settings when leave game
 -technic mod recipes added
 -print total init time in debug
 -craft type icon buttons

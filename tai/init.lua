@@ -20,14 +20,14 @@ if minetest.get_modpath('technic') then
     dofile(path..'/recipe_technic.lua')
 end
 
-tai.config.delay = tai.setting_get('tai_delay_time', 5)
-tai.config.whitelist = tai.setting_get('tai_filters', ''):split(',')
-tai.config.bgcolor = tai.setting_get('tai_bgcolor', '#21252BFF')
-tai.config.slot_bg = tai.setting_get('tai_slot_bg', '#282C34FF')
-tai.config.slot_bg_hover = tai.setting_get('tai_slot_bg_hover', '#2C323CFF')
-tai.config.slot_border = tai.setting_get('tai_slot_border', '#181A1FFF')
-tai.config.tooltip = tai.setting_get('tai_tooltip', '#FFFFFFFF')
-tai.config.tooltip_bg = tai.setting_get('tai_tooltip_bg', '#66666666')
+tai.config.delay = tai.settings:get('tai_delay_time', 5)
+tai.config.whitelist = tai.settings:get('tai_filters', ''):split(',')
+tai.config.bgcolor = tai.settings:get('tai_bgcolor', '#21252BFF')
+tai.config.slot_bg = tai.settings:get('tai_slot_bg', '#282C34FF')
+tai.config.slot_bg_hover = tai.settings:get('tai_slot_bg_hover', '#2C323CFF')
+tai.config.slot_border = tai.settings:get('tai_slot_border', '#181A1FFF')
+tai.config.tooltip = tai.settings:get('tai_tooltip', '#FFFFFFFF')
+tai.config.tooltip_bg = tai.settings:get('tai_tooltip_bg', '#66666666')
 
 local trash = minetest.create_detached_inventory("tai_trash", {
 	allow_put = function(inv, listname, index, stack, player)
@@ -57,6 +57,17 @@ minetest.register_on_joinplayer(function(player)
         tai.do_action('init_player', tai.player_config[name], player, {})
         player:set_inventory_formspec(tai.build_formspec(player:get_player_name()))
     end)
+end)
+
+minetest.register_on_leaveplayer(function(player)
+    tai.settings:save_data(player:get_player_name())
+    tai.player_config[player_name] = nil
+end)
+
+minetest.register_on_shutdown(function()
+    for player_name, def in pairs(tai.player_config) do
+        tai.settings:save_data(player_name)
+    end
 end)
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)

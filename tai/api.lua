@@ -1,3 +1,27 @@
+tai.settings = {}
+tai.settings.get = function (self, setting, default)
+    local val = minetest.settings:get(setting)
+    if val and val ~= '' then
+        return val
+    else
+        return default
+    end
+end
+
+tai.settings.get_data = function (self, player_name)
+    local player = minetest.get_player_by_name(player_name)
+    local data
+    if player then
+        data = minetest.deserialize(player:get_attribute('tai:data'))
+    end
+    return data
+end
+
+tai.settings.save_data = function (self, player_name)
+    local player = minetest.get_player_by_name(player_name)
+    player:set_attribute('tai:data', minetest.serialize(tai.player_config[player_name]))
+end
+
 tai.build_formspec = function(player_name)
     local cfg = tai.player_config[player_name]
     -- print("player config: "..dump(cfg))
@@ -10,15 +34,6 @@ tai.build_formspec = function(player_name)
     return table.concat(formspec, "")
 end
 
-tai.setting_get = function(setting, default)
-    local val = minetest.settings:get(setting)
-    if val and val ~= '' then
-        return val
-    else
-        return default
-    end
-end
-
 tai.register_tab = function (def)
     tai.tabs[def.index] = def
     tai.inv.tabs = {}
@@ -29,11 +44,14 @@ end
 
 tai.add_action = function (action, func)
     if action and action ~= '' then
-        if tai.callbacks[action] == nil then
-            tai.callbacks[action] = {}
-        end
-        if type(func) == 'function' then
-            table.insert(tai.callbacks[action], func)
+        local actions = action:split(' ')
+        for i, a in ipairs(actions) do
+            if tai.callbacks[a] == nil then
+                tai.callbacks[a] = {}
+            end
+            if type(func) == 'function' then
+                table.insert(tai.callbacks[a], func)
+            end
         end
     end
 end
@@ -59,21 +77,26 @@ tai.apply_filter = function (action, ...)
 end
 
 tai.init_player = function(player_name)
-    tai.player_config[player_name] = {
-        player_name = player_name,
-        page = 0,
-        filter = '',
-        tab = 1,
-        category = 0,
-        formspec = {
-            player = 1,
-            craft = 1
-        },
-        recipe = {
-            typeindex = 1,
-            index = 1
+    local data = tai.settings:get_data(player_name)
+    if data then
+        tai.player_config[player_name] = data
+    else
+        tai.player_config[player_name] = {
+            player_name = player_name,
+            page = 0,
+            filter = '',
+            tab = 1,
+            category = 0,
+            formspec = {
+                player = 1,
+                craft = 1
+            },
+            recipe = {
+                typeindex = 1,
+                index = 1
+            }
         }
-    }
+    end
 end
 
 tai.init_items = function ()

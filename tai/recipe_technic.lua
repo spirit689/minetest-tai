@@ -31,8 +31,6 @@ local function inv_technic (recipe)
         pos = tai.inv_coords({x = 5 + i * 1.3, y = 4.5})
         formspec[#formspec + 1] = 'label['..pos.x..','..pos.y..';'..ItemStack(item):get_count()..']'
     end
-
-    print(dump(technic.recipes))
     return table.concat(formspec, '')
 end
 

@@ -54,18 +54,12 @@ tai.add_action('tai_togglearmor', function (cfg, player, fields)
     end
 end)
 
-tai.add_action('tai_tab', function (cfg, player, fields)
+tai.add_action('tai_tab init_player', function (cfg, player, fields)
     if cfg.tab == 1 then
         cfg.formspec.craft = 0
         cfg.formspec.armor = 1
         cfg.formspec.armorcraft = 1
     end
-end)
-
-tai.add_action('init_player', function (cfg, player, fields)
-    cfg.formspec.craft = 0
-    cfg.formspec.armor = 1
-    cfg.formspec.armorcraft = 1
 end)
 
 armor:register_on_update(function(player)
