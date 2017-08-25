@@ -1,17 +1,38 @@
 tai.register_tab({
     index = 1,
-    name = 'Main',
+    id = 'main:default',
+    name = 'Main'
 })
 
 tai.register_tab({
     index = 2,
-    name = 'Items',
+    id = 'items:default',
+    name = 'Items'
+})
+
+tai.register_tab({
+    index = 2,
+    id = 'items:recipe',
+    name = 'Items'
+})
+
+tai.register_tab({
+    index = 2,
+    id = 'items:search_mod',
+    name = 'Items'
 })
 
 tai.register_tab({
     index = 3,
-    name = 'Settings',
+    id = 'settings:default',
+    name = 'Settings'
 })
+
+tai.add_action('init_player', function (cfg)
+    if not cfg.tabs then
+        cfg.tabs = { 'main:default', 'items:default', 'settings:default'}
+    end
+end)
 
 tai.add_action('tai_prev', function(cfg, player, fields)
     cfg.page = cfg.page - 1
@@ -23,9 +44,7 @@ end)
 
 tai.add_action('tai_showmods', function(cfg, player, fields)
     cfg.oldfilter = cfg.filter
-    cfg.formspec.mods = 1
-    cfg.formspec.items = 0
-    cfg.formspec.player = 0
+    cfg.tab = 'items:search_mod'
 end)
 
 tai.add_action('tai_mod', function(cfg, player, fields)
@@ -36,27 +55,21 @@ tai.add_action('tai_mod', function(cfg, player, fields)
             cfg.category = evt.row
         end
         if evt.type == "DCL" then
-            cfg.formspec.items = 1
-            cfg.formspec.player = 1
-            cfg.formspec.mods = 0
             cfg.page = 0
+            cfg.tab = 'items:default'
         end
     end
 end)
 
 tai.add_action('tai_modsearch', function(cfg, player, fields)
-    cfg.formspec.items = 1
-    cfg.formspec.player = 1
-    cfg.formspec.mods = 0
     cfg.page = 0
+    cfg.tab = 'items:default'
 end)
 
 tai.add_action('tai_modcancel', function(cfg, player, fields)
     cfg.filter = cfg.oldfilter
-    cfg.formspec.items = 1
-    cfg.formspec.player = 1
-    cfg.formspec.mods = 0
     cfg.page = 0
+    cfg.tab = 'items:default'
 end)
 
 tai.add_action('tai_search', function(cfg, player, fields)
@@ -67,30 +80,33 @@ tai.add_action('tai_search', function(cfg, player, fields)
             cfg.filter = ''
         end
         cfg.page = 0
-        cfg.formspec.items = 1
     end
 end)
 
 tai.add_action('tai_tab', function(cfg, player, fields)
-    cfg.tab = tonumber(fields["tai_tab"])
+    cfg.tab = cfg.tabs[tonumber(fields["tai_tab"])]
+end)
+
+tai.add_action('tai_tab_switch', function (cfg)
+    cfg.tab = tai.apply_filter('tai_tab_name', cfg.tab)
+    local index = tai.tabs[cfg.tab].index
     for part, enabled in pairs(cfg.formspec) do
         if enabled == 1 then
             cfg.formspec[part] = 0
         end
     end
-    if cfg.tab == 1 then
+    cfg.tabs[index] = cfg.tab
+    if cfg.tab == 'main:default' then
         cfg.formspec.craft = 1
         cfg.formspec.player = 1
-    elseif cfg.tab == 2 then
+    elseif cfg.tab == 'items:default' then
         cfg.formspec.items = 1
-        if cfg.recipe.show and cfg.recipe.enabled then
-            cfg.formspec.recipe = 1
-            cfg.formspec.items = 0
-            cfg.formspec.player = 0
-        else
-            cfg.formspec.player = 1
-        end
-    elseif cfg.tab == 3 then
+        cfg.formspec.player = 1
+    elseif cfg.tab == 'items:recipe' then
+        cfg.formspec.recipe = 1
+    elseif cfg.tab == 'items:search_mod' then
+        cfg.formspec.mods = 1
+    elseif cfg.tab == 'settings:default' then
         cfg.formspec.settings = 1
     end
 end)
@@ -114,11 +130,8 @@ end)
 tai.add_action('tai_item', function (cfg, player, fields)
     local craft_item = fields.item
     if tai.craft_recipe[craft_item] and cfg.recipe.enabled then
-        cfg.formspec.player = 0
-        cfg.formspec.items = 0
-        cfg.formspec.recipe = 1
-        cfg.recipe.show = true
         cfg.recipe.item = craft_item
+        cfg.tab = 'items:recipe'
     else
         if minetest.check_player_privs(player, {creative = true}) and not craft_item:find('group:', 1, true) then
             tai.give_item(player, fields.item)

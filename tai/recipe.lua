@@ -75,11 +75,8 @@ tai.add_action('tai_craft_prev', function (cfg, player, fields)
 end)
 
 tai.add_action('tai_recipe_hide', function (cfg, player, fields)
-    cfg.formspec.player = 1
-    cfg.formspec.items = 1
-    cfg.formspec.recipe = 0
-    cfg.recipe.show = false
     cfg.recipe.item = ''
+    cfg.tab = 'items:default'
 end)
 
 tai.add_action('init', function (cfg)

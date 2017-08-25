@@ -1,6 +1,17 @@
 local inv = tai.inv
 
 -- inventory
+tai.register_tab({
+    index = 1,
+    id = 'main:armor',
+    name = 'Main'
+})
+
+tai.register_tab({
+    index = 1,
+    id = 'main:armorstats',
+    name = 'Main'
+})
 
 inv.armor = function(cfg)
     local formspec = {}
@@ -46,20 +57,26 @@ end
 
 tai.add_action('tai_togglearmor', function (cfg, player, fields)
     if cfg.formspec.armorstats == 1 then
-        cfg.formspec.armorcraft = 1
-        cfg.formspec.armorstats = 0
+        cfg.tab = 'main:armor'
     else
-        cfg.formspec.armorcraft = 0
-        cfg.formspec.armorstats = 1
+        cfg.tab = 'main:armorstats'
     end
 end)
 
-tai.add_action('tai_tab init_player', function (cfg, player, fields)
-    if cfg.tab == 1 then
-        cfg.formspec.craft = 0
+tai.add_action('tai_tab_switch', function (cfg)
+    if cfg.tab == 'main:armor' then
         cfg.formspec.armor = 1
         cfg.formspec.armorcraft = 1
+        cfg.formspec.player = 1
+    elseif cfg.tab == 'main:armorstats' then
+        cfg.formspec.armor = 1
+        cfg.formspec.armorstats = 1
+        cfg.formspec.player = 1
     end
+end)
+
+tai.add_action('init_player', function (cfg, player, fields)
+    cfg.tab = 'main:armor'
 end)
 
 armor:register_on_update(function(player)

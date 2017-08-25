@@ -35,11 +35,7 @@ tai.build_formspec = function(player_name)
 end
 
 tai.register_tab = function (def)
-    tai.tabs[def.index] = def
-    tai.inv.tabs = {}
-    for i,def in ipairs(tai.tabs) do
-        table.insert(tai.inv.tabs, def.name)
-    end
+    tai.tabs[def.id] = def
 end
 
 tai.add_action = function (action, func)

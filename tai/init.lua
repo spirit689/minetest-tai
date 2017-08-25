@@ -55,6 +55,7 @@ minetest.register_on_joinplayer(function(player)
         minetest.chat_send_player(player:get_player_name(), "TAI: Initialized")
         tai.init_player(name)
         tai.do_action('init_player', tai.player_config[name], player, {})
+        tai.do_action('tai_tab_switch', tai.player_config[name])
         player:set_inventory_formspec(tai.build_formspec(player:get_player_name()))
     end)
 end)
@@ -83,6 +84,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
             end
         end
     end
+    tai.do_action('tai_tab_switch', cfg)
     player:set_inventory_formspec(tai.build_formspec(name))
 end)
 

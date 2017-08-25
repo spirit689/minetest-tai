@@ -1,7 +1,6 @@
 local inv = {}
 tai.inv = inv
 
-inv.tabs = {}
 inv.main = function(cfg)
     local formspec = {}
     local colors = {
@@ -19,7 +18,12 @@ inv.main = function(cfg)
 end
 
 inv.pages = function(cfg)
-    local formspec = 'tabheader[0,0;tai_tab;'..table.concat(inv.tabs, ',')..';'..cfg.tab..';true;false]'
+    local formspec = ''
+    local tabs = {}
+    for _, id in ipairs(cfg.tabs) do
+        tabs[#tabs + 1] = tai.tabs[id].name
+    end
+    formspec = 'tabheader[0,0;tai_tab;'..table.concat(tabs, ',')..';'..tai.tabs[cfg.tab].index..';true;false]'
     return formspec
 end
 

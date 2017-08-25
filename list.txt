@@ -14,6 +14,7 @@ tai_mod: Mod list - select item
 tai_modsearch: Mod list - OK
 tai_modcancel: Mod list - Cancel
 tai_tab: Tabs - Switch tab
+tai_tab_switch: Tabs - Switch tab
 tai_item: Item button pressed
 tai_setting_recipe: Settings - Recipe Button
 tai_setting_creative: Settings - Creative Button
@@ -21,6 +22,9 @@ tai_give: Recipe - Take item
 tai_crafttype: Recipe - Select craft type
 tai_craft_next: Recipe - Next recipe
 tai_craft_prev: Recipe - Previous recipe
+
+Filters:
+tai_tab_name(tabname): Tabs - Switch tab
 
 Formspec parts:
 main: Main window
